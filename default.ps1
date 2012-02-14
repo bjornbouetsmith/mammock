@@ -3,13 +3,15 @@ properties {
   $lib_dir = "$base_dir\SharedLibs"
   $build_dir = "$base_dir\build" 
   
-  $sln_file = "$base_dir\Rhino.Mocks.sln" 
-  $version = "3.6.0.0"
-  $humanReadableversion = "3.6"
+  $sln_file = "$base_dir\Mammock.sln" 
+  $version = "1.0.0.0"
+  $humanReadableversion = "1.0"
   $tools_dir = "$base_dir\Tools"
   $release_dir = "$base_dir\Release"
   $uploadCategory = "Rhino-Mocks"
   $uploader = "..\Uploader\S3Uploader.exe"
+  $copyright = "Hibernating Rhinos & Ayende Rahien 2004 - 2009, Bjørn Bouet Smith 2012"
+  $company = "Bjørn Bouet Smith"
 } 
 
 include .\psake_ext.ps1
@@ -24,44 +26,44 @@ task Clean {
 task Init -depends Clean { 
 	
 	Generate-Assembly-Info `
-		-file "$base_dir\Rhino.Mocks\Properties\AssemblyInfo.cs" `
-		-title "Rhino Mocks $version" `
+		-file "$base_dir\Mammock\Properties\AssemblyInfo.cs" `
+		-title "Mammock $version" `
 		-description "Mocking Framework for .NET" `
-		-company "Hibernating Rhinos" `
-		-product "Rhino Mocks $version" `
+		-company $company `
+		-product "Mammock $version" `
 		-version $version `
-		-copyright "Hibernating Rhinos & Ayende Rahien 2004 - 2009" `
-		-internalsVisibleTo "Rhino.Mocks.Tests, PublicKey=00240000048000009400000006020000002400005253413100040000010001009d1cf4b75b7218b141ac64c15450141b1e5f41f6a302ac717ab9761fa6ae2c3ee0c354c22d0a60ac59de41fa285d572e7cf33c320aa7ff877e2b7da1792fcc6aa4eb0b4d8294a2f74cb14d03fb9b091f751d6dc49e626d74601692c99eab7718ed76a40c36d39af842be378b677e6e4eae973f643d7065241ad86ecc156d81ab"
+		-copyright $copyright `
+		-internalsVisibleTo "Rhino.Mocks.Tests"
 		
 	Generate-Assembly-Info `
-		-file "$base_dir\Rhino.Mocks.Tests\Properties\AssemblyInfo.cs" `
-		-title "Rhino Mocks Tests $version" `
+		-file "$base_dir\Mammock.Tests\Properties\AssemblyInfo.cs" `
+		-title "Mammock Tests $version" `
 		-description "Mocking Framework for .NET" `
-		-company "Hibernating Rhinos" `
-		-product "Rhino Mocks Tests $version" `
+		-company $company `
+		-product "Mammock Tests $version" `
 		-version $version `
 		-clsCompliant "false" `
-		-copyright "Hibernating Rhinos & Ayende Rahien 2004 - 2009"
+		-copyright $copyright
 		
 	Generate-Assembly-Info `
-		-file "$base_dir\Rhino.Mocks.Tests.Model\Properties\AssemblyInfo.cs" `
-		-title "Rhino Mocks Tests Model $version" `
+		-file "$base_dir\Mammock.Tests.Model\Properties\AssemblyInfo.cs" `
+		-title "Mammock Tests Model $version" `
 		-description "Mocking Framework for .NET" `
-		-company "Hibernating Rhinos" `
-		-product "Rhino Mocks Tests Model $version" `
+		-company $company `
+		-product "Mammock Tests Model $version" `
 		-version $version `
 		-clsCompliant "false" `
-		-copyright "Hibernating Rhinos & Ayende Rahien 2004 - 2009"
+		-copyright $copyright
 	
 	Generate-Assembly-Info `
 		-file "$base_dir\Rhino.Mocks.GettingStarted\Properties\AssemblyInfo.cs" `
-		-title "Rhino Mocks Tests $version" `
+		-title "Mammock Tests $version" `
 		-description "Mocking Framework for .NET" `
-		-company "Hibernating Rhinos" `
-		-product "Rhino Mocks Tests $version" `
+		-company $company `
+		-product "Mammock Tests $version" `
 		-version $version `
 		-clsCompliant "false" `
-		-copyright "Hibernating Rhinos & Ayende Rahien 2004 - 2009"
+		-copyright $copyright
 		
 	new-item $release_dir -itemType directory 
 	new-item $build_dir -itemType directory 
@@ -105,7 +107,7 @@ task Merge {
 	cd $old
 }
 
-task Release -depends Test, Merge {
+task Release -depends Test {
 	& $tools_dir\zip.exe -9 -A -j `
 		$release_dir\Rhino.Mocks-$humanReadableversion-Build-$env:ccnetnumericlabel.zip `
 		$build_dir\Rhino.Mocks.dll `
