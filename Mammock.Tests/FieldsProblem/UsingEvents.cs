@@ -87,9 +87,10 @@ namespace Rhino.Mocks.Tests.FieldsProblem
 			subscriber.Hanlder(events, new EventArgs());
 			mocks.ReplayAll();
 			
-			Assert.Throws<ExpectationViolationException>(
-				"IEventSubscriber.Hanlder(Rhino.Mocks.Tests.FieldsProblem.WithEvents, System.EventArgs); Expected #0, Actual #1.\r\nIEventSubscriber.Hanlder(Rhino.Mocks.Tests.FieldsProblem.WithEvents, System.EventArgs); Expected #1, Actual #0.",
+			string expectedMessage="IEventSubscriber.Hanlder(Rhino.Mocks.Tests.FieldsProblem.WithEvents, System.EventArgs); Expected #0, Actual #1.\r\nIEventSubscriber.Hanlder(Rhino.Mocks.Tests.FieldsProblem.WithEvents, System.EventArgs); Expected #1, Actual #0.";
+ExpectationViolationException ex = Assert.Throws<ExpectationViolationException>(
 				() => events.RaiseEvent());
+Assert.Equal(expectedMessage, ex.Message);
 		}
 
 		[Fact]
@@ -110,8 +111,10 @@ namespace Rhino.Mocks.Tests.FieldsProblem
 			IWithEvents events = (IWithEvents)mocks.StrictMock(typeof(IWithEvents));
 			events.Blah += new EventHandler(events_Blah);
 			mocks.ReplayAll();
-			Assert.Throws<ExpectationViolationException>("IWithEvents.add_Blah(System.EventHandler); Expected #1, Actual #0.",
+			string expectedMessage="IWithEvents.add_Blah(System.EventHandler); Expected #1, Actual #0.";
+ExpectationViolationException ex = Assert.Throws<ExpectationViolationException>(
 			                                             () => mocks.VerifyAll());
+Assert.Equal(expectedMessage, ex.Message);
 
 		}
 
@@ -136,9 +139,10 @@ namespace Rhino.Mocks.Tests.FieldsProblem
 			mocks.ReplayAll();
 			events.Blah += delegate { };
 			
-			Assert.Throws<InvalidOperationException>(
-				"You have called the event raiser with the wrong number of parameters. Expected 2 but was 0",
+			string expectedMessage="You have called the event raiser with the wrong number of parameters. Expected 2 but was 0";
+InvalidOperationException ex = Assert.Throws<InvalidOperationException>(
 				() => raiser.Raise(null));
+Assert.Equal(expectedMessage, ex.Message);
 		}
 
 		[Fact]
@@ -149,9 +153,10 @@ namespace Rhino.Mocks.Tests.FieldsProblem
 			raiser = LastCall.IgnoreArguments().GetEventRaiser();
 			mocks.ReplayAll();
 			events.Blah += delegate { };
-			Assert.Throws<InvalidOperationException>(
-				"Parameter #2 is System.Int32 but should be System.EventArgs",
+			string expectedMessage="Parameter #2 is System.Int32 but should be System.EventArgs";
+InvalidOperationException ex = Assert.Throws<InvalidOperationException>(
 				() => raiser.Raise("", 1));
+Assert.Equal(expectedMessage, ex.Message);
 		}
 
 		private void events_Blah_Other(object sender, EventArgs e)
@@ -210,7 +215,7 @@ namespace Rhino.Mocks.Tests.FieldsProblem
 			raiser.Raise(this, EventArgs.Empty);
 		}
 
-#if DOTNET35
+
 		
         [Fact]
         public void RaiseEventUsingExtensionMethod() 
@@ -246,7 +251,7 @@ namespace Rhino.Mocks.Tests.FieldsProblem
 
             Assert.True(called);
 		}
-#endif
+
 
 	}
 

@@ -1,4 +1,4 @@
-#if DOTNET35
+
 using Xunit;
 
 namespace Rhino.Mocks.Tests
@@ -92,4 +92,3 @@ IDemo.VoidStringArg(""blah""); Expected #1, Actual #0.",delegate
 		}
 	}
 }
-#endif

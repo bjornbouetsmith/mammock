@@ -44,8 +44,7 @@ namespace Rhino.Mocks.Tests.FieldsProblem
         {
             MockRepository repository = new MockRepository();
             IGetResults resultGetter = repository.Stub<IGetResults>();
-        	Assert.Throws<InvalidOperationException>(
-        		"You have already specified constraints for this method. (IGetResults.GetSomeNumber(contains \"b\");)",
+            InvalidOperationException ex = Assert.Throws<InvalidOperationException>(
         		() =>
         		{
         			using (repository.Record())
@@ -55,6 +54,8 @@ namespace Rhino.Mocks.Tests.FieldsProblem
         				LastCall.Constraints(Text.Contains("a"));
         			}
         		});
+
+            Assert.Equal("You have already specified constraints for this method. (IGetResults.GetSomeNumber(contains \"b\");)", ex.Message);
         }
     }
 

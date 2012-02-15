@@ -33,7 +33,7 @@ task Init -depends Clean {
 		-product "Mammock $version" `
 		-version $version `
 		-copyright $copyright `
-		-internalsVisibleTo "Rhino.Mocks.Tests"
+		-internalsVisibleTo "Mammock.Tests"
 		
 	Generate-Assembly-Info `
 		-file "$base_dir\Mammock.Tests\Properties\AssemblyInfo.cs" `
@@ -43,7 +43,8 @@ task Init -depends Clean {
 		-product "Mammock Tests $version" `
 		-version $version `
 		-clsCompliant "false" `
-		-copyright $copyright
+		-copyright $copyright `
+		-internalsVisibleTo "Mammock.Tests"
 		
 	Generate-Assembly-Info `
 		-file "$base_dir\Mammock.Tests.Model\Properties\AssemblyInfo.cs" `
@@ -53,17 +54,19 @@ task Init -depends Clean {
 		-product "Mammock Tests Model $version" `
 		-version $version `
 		-clsCompliant "false" `
-		-copyright $copyright
+		-copyright $copyright `
+		-internalsVisibleTo "Mammock.Tests"
 	
 	Generate-Assembly-Info `
-		-file "$base_dir\Rhino.Mocks.GettingStarted\Properties\AssemblyInfo.cs" `
+		-file "$base_dir\Mammock.GettingStarted\Properties\AssemblyInfo.cs" `
 		-title "Mammock Tests $version" `
 		-description "Mocking Framework for .NET" `
 		-company $company `
 		-product "Mammock Tests $version" `
 		-version $version `
 		-clsCompliant "false" `
-		-copyright $copyright
+		-copyright $copyright `
+		-internalsVisibleTo "Mammock.Tests"
 		
 	new-item $release_dir -itemType directory 
 	new-item $build_dir -itemType directory 
@@ -80,7 +83,7 @@ task Compile -depends Init {
 task Test -depends Compile {
   $old = pwd
   cd $build_dir
-  &.\Xunit.console.exe "$build_dir\Rhino.Mocks.Tests.dll"
+  &.\Xunit.console.clr4.x86.exe "$build_dir\Mammock.Tests.dll" /-Trait "Category=NotWorking"
   if ($lastExitCode -ne 0) {
         throw "Error: Failed to execute tests"
   }
@@ -108,10 +111,11 @@ task Merge {
 }
 
 task Release -depends Test {
+	$commit = Get-Git-Commit
 	& $tools_dir\zip.exe -9 -A -j `
-		$release_dir\Rhino.Mocks-$humanReadableversion-Build-$env:ccnetnumericlabel.zip `
-		$build_dir\Rhino.Mocks.dll `
-		$build_dir\Rhino.Mocks.xml `
+		$release_dir\Mammock-$humanReadableversion-Build-$commit.zip `
+		$build_dir\Mammock.dll `
+		$build_dir\Mammock.xml `
 		license.txt `
 		acknowledgements.txt
 	if ($lastExitCode -ne 0) {
@@ -121,13 +125,14 @@ task Release -depends Test {
 
 
 task Upload -depends Release {
+	$commit = Get-Git-Commit
 	Write-Host "Starting upload"
 	if (Test-Path $uploader) {
 		$log = $env:push_msg 
     if($log -eq $null -or $log.Length -eq 0) {
       $log = git log -n 1 --oneline		
     }
-		&$uploader "$uploadCategory" "$release_dir\Rhino.Mocks-$humanReadableversion-Build-$env:ccnetnumericlabel.zip" "$log"
+		&$uploader "$uploadCategory" "$release_dir\Rhino.Mocks-$humanReadableversion-Build-$commit" "$log"
 		
 		if ($lastExitCode -ne 0) {
       write-host "Failed to upload to S3: $lastExitCode"

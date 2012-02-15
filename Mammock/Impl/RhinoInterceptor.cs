@@ -66,7 +66,7 @@ namespace Rhino.Mocks.Impl
         /// <summary>
         /// Intercept a method call and direct it to the repository.
         /// </summary>
-        [MethodImpl(MethodImplOptions.Synchronized)]
+        //[MethodImpl(MethodImplOptions.Synchronized)]
         public void Intercept(IInvocation invocation)
         {
             proxyInstance.MockedObjectInstance = invocation.Proxy;

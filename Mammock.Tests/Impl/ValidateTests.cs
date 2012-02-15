@@ -34,155 +34,158 @@ using System.Collections;
 
 namespace Rhino.Mocks.Tests.Impl
 {
-	
-	public class ValidateTests
-	{
-		[Fact]
-		public void IsNotNullWhenNotNull()
-		{
-			Validate.IsNotNull(new object(), "test");
-		}
 
-		[Fact]
-		public void IsNotNullWhenNullThrows()
-		{
-			Assert.Throws<ArgumentNullException>(
-				"Value cannot be null.\r\nParameter name: test",
-				() => Validate.IsNotNull(null, "test"));
-		}
+    public class ValidateTests
+    {
+        [Fact]
+        public void IsNotNullWhenNotNull()
+        {
+            Validate.IsNotNull(new object(), "test");
+        }
+
+        [Fact]
+        public void IsNotNullWhenNullThrows()
+        {
+            string expectedMessage = "Value cannot be null.\r\nParameter name: test";
+            ArgumentNullException ex = Assert.Throws<ArgumentNullException>(
+                            () => Validate.IsNotNull(null, "test"));
+            Assert.Equal(expectedMessage, ex.Message);
+        }
 
         [Fact]
         public void IsNotNull_throws_exception_when_argument_is_null()
         {
             string sample = null;
 
-            Assert.Throws<ArgumentNullException>(
-                "Value cannot be null.\r\nParameter name:sample",
-                () => Validate.IsNotNull(() => sample));
+            string expectedMessage = @"Value cannot be null.
+Parameter name: sample";
+            ArgumentNullException ex = Assert.Throws<ArgumentNullException>(
+                            () => Validate.IsNotNull(() => sample));
+            Assert.Equal(expectedMessage, ex.Message);
         }
 
-		[Fact]
-		public void ArgsEqualWhenNoArgs()
-		{
-			Assert.True(Validate.ArgsEqual(new object[0], new object[0]));
-		}
+        [Fact]
+        public void ArgsEqualWhenNoArgs()
+        {
+            Assert.True(Validate.ArgsEqual(new object[0], new object[0]));
+        }
 
-		[Fact]
-		public void HandlingArraysWithNull()
-		{
-			Assert.False(Validate.ArgsEqual(new object[] {1, null}, new object[] {1, "43"}));
-			Assert.False(Validate.ArgsEqual(new object[] {1, "43", 5.2f}, new object[] {1, null}));
-			Assert.True(Validate.ArgsEqual(new object[] {null, "43"}, new object[] {null, "43"}));
-	
-		}
+        [Fact]
+        public void HandlingArraysWithNull()
+        {
+            Assert.False(Validate.ArgsEqual(new object[] { 1, null }, new object[] { 1, "43" }));
+            Assert.False(Validate.ArgsEqual(new object[] { 1, "43", 5.2f }, new object[] { 1, null }));
+            Assert.True(Validate.ArgsEqual(new object[] { null, "43" }, new object[] { null, "43" }));
 
-		[Fact]
-		public void ArgsEqualWithDifferentNumberOfParameters()
-		{
-			Assert.False(Validate.ArgsEqual(new object[] {1, "43", 5.2f}, new object[] {1, "43"}));
-		}
+        }
 
-		[Fact]
-		public void ArgsEqualWhenArgsMatch()
-		{
-			Assert.True(Validate.ArgsEqual(new object[] {1, "43", 5.2f}, new object[] {1, "43", 5.2f}));
-		}
+        [Fact]
+        public void ArgsEqualWithDifferentNumberOfParameters()
+        {
+            Assert.False(Validate.ArgsEqual(new object[] { 1, "43", 5.2f }, new object[] { 1, "43" }));
+        }
 
-		[Fact]
-		public void ArgsEqualWhenArgsMismatch()
-		{
-			Assert.False(Validate.ArgsEqual(new object[] {1, "43", 5.1f}, new object[] {1, "43", 6.4f}));
-		}
+        [Fact]
+        public void ArgsEqualWhenArgsMatch()
+        {
+            Assert.True(Validate.ArgsEqual(new object[] { 1, "43", 5.2f }, new object[] { 1, "43", 5.2f }));
+        }
 
-		[Fact]
-		public void ArgsEqualWithArrayReferenceEqual()
-		{
-			object[] arr = new object[3] {"1", 2, 4.5f};
-			Assert.True(Validate.ArgsEqual(new object[] {1, arr}, new object[] {1, arr}));
-		}
+        [Fact]
+        public void ArgsEqualWhenArgsMismatch()
+        {
+            Assert.False(Validate.ArgsEqual(new object[] { 1, "43", 5.1f }, new object[] { 1, "43", 6.4f }));
+        }
 
-		[Fact]
-		public void ArgsEqualWithArrayContentEqual()
-		{
-			object[] arr1 = new object[3] {"1", 2, 4.5f},
-				arr2 = new object[3] {"1", 2, 4.5f};
-			Assert.True(Validate.ArgsEqual(new object[] {1, arr2}, new object[] {1, arr1}));
-		}
+        [Fact]
+        public void ArgsEqualWithArrayReferenceEqual()
+        {
+            object[] arr = new object[3] { "1", 2, 4.5f };
+            Assert.True(Validate.ArgsEqual(new object[] { 1, arr }, new object[] { 1, arr }));
+        }
 
-		[Fact]
-		public void ArgsEqualWithArrayContentDifferent()
-		{
-			object[] arr1 = new object[3] {"1", 2, 4.5f},
-				arr2 = new object[3] {"1", 5, 4.5f};
-			Assert.False(Validate.ArgsEqual(new object[] {1, arr1}, new object[] {1, arr2}));
+        [Fact]
+        public void ArgsEqualWithArrayContentEqual()
+        {
+            object[] arr1 = new object[3] { "1", 2, 4.5f },
+                arr2 = new object[3] { "1", 2, 4.5f };
+            Assert.True(Validate.ArgsEqual(new object[] { 1, arr2 }, new object[] { 1, arr1 }));
+        }
 
-		}
+        [Fact]
+        public void ArgsEqualWithArrayContentDifferent()
+        {
+            object[] arr1 = new object[3] { "1", 2, 4.5f },
+                arr2 = new object[3] { "1", 5, 4.5f };
+            Assert.False(Validate.ArgsEqual(new object[] { 1, arr1 }, new object[] { 1, arr2 }));
 
-		[Fact]
-		public void ArgsEqualWithArrayContentLengthDifferent()
-		{
-			object[] arr1 = new object[3] {"1", 2, 4.5f},
-				arr2 = new object[2] {"1", 5};
-			Assert.False(Validate.ArgsEqual(new object[] {1, arr1}, new object[] {1, arr2}));
-		}
+        }
 
-		[Fact]
-		public void ArgsEqualWithStringArray()
-		{
-			string[] str1 = new string[] {"", "1", "1234"},
-				str2 = new string[] {"1", "1234", "54321"};
-			Assert.False(Validate.ArgsEqual(str1, str2));
-		}
+        [Fact]
+        public void ArgsEqualWithArrayContentLengthDifferent()
+        {
+            object[] arr1 = new object[3] { "1", 2, 4.5f },
+                arr2 = new object[2] { "1", 5 };
+            Assert.False(Validate.ArgsEqual(new object[] { 1, arr1 }, new object[] { 1, arr2 }));
+        }
 
-		[Fact]
-		public void ArgsEqualWithCollectionReferenceEqual()
-		{
-			Queue queue = new Queue(3);
-			queue.Enqueue("1");
-			queue.Enqueue(2);
-			queue.Enqueue(4.5f);
-			Assert.True(Validate.ArgsEqual(new object[] { 1, queue }, new object[] { 1, queue }));
-		}
+        [Fact]
+        public void ArgsEqualWithStringArray()
+        {
+            string[] str1 = new string[] { "", "1", "1234" },
+                str2 = new string[] { "1", "1234", "54321" };
+            Assert.False(Validate.ArgsEqual(str1, str2));
+        }
 
-		[Fact]
-		public void ArgsEqualWithCollectionContentEqual()
-		{
-			Queue queue1 = new Queue(3);
-			queue1.Enqueue("1");
-			queue1.Enqueue(2);
-			queue1.Enqueue(4.5f);
-			Queue queue2 = new Queue(3);
-			queue2.Enqueue("1");
-			queue2.Enqueue(2);
-			queue2.Enqueue(4.5f);
-			Assert.True(Validate.ArgsEqual(new object[] { 1, queue1 }, new object[] { 1, queue2 }));
-		}
+        [Fact]
+        public void ArgsEqualWithCollectionReferenceEqual()
+        {
+            Queue queue = new Queue(3);
+            queue.Enqueue("1");
+            queue.Enqueue(2);
+            queue.Enqueue(4.5f);
+            Assert.True(Validate.ArgsEqual(new object[] { 1, queue }, new object[] { 1, queue }));
+        }
 
-		[Fact]
-		public void ArgsEqualWithCollectionContentDifferent()
-		{
-			Queue queue1 = new Queue(3);
-			queue1.Enqueue("1");
-			queue1.Enqueue(2);
-			queue1.Enqueue(4.5f);
-			Queue queue2 = new Queue(3);
-			queue2.Enqueue("1");
-			queue2.Enqueue(5);
-			queue2.Enqueue(4.5f);
-			Assert.False(Validate.ArgsEqual(new object[] { 1, queue1 }, new object[] { 1, queue2 }));
-		}
+        [Fact]
+        public void ArgsEqualWithCollectionContentEqual()
+        {
+            Queue queue1 = new Queue(3);
+            queue1.Enqueue("1");
+            queue1.Enqueue(2);
+            queue1.Enqueue(4.5f);
+            Queue queue2 = new Queue(3);
+            queue2.Enqueue("1");
+            queue2.Enqueue(2);
+            queue2.Enqueue(4.5f);
+            Assert.True(Validate.ArgsEqual(new object[] { 1, queue1 }, new object[] { 1, queue2 }));
+        }
 
-		[Fact]
-		public void ArgsEqualWithCollectionContentLengthDifferent()
-		{
-			Queue queue1 = new Queue(3);
-			queue1.Enqueue("1");
-			queue1.Enqueue(2);
-			queue1.Enqueue(4.5f);
-			Queue queue2 = new Queue(2);
-			queue2.Enqueue("1");
-			queue2.Enqueue(5);
-			Assert.False(Validate.ArgsEqual(new object[] { 1, queue1 }, new object[] { 1, queue2 }));
-		}
-	}
+        [Fact]
+        public void ArgsEqualWithCollectionContentDifferent()
+        {
+            Queue queue1 = new Queue(3);
+            queue1.Enqueue("1");
+            queue1.Enqueue(2);
+            queue1.Enqueue(4.5f);
+            Queue queue2 = new Queue(3);
+            queue2.Enqueue("1");
+            queue2.Enqueue(5);
+            queue2.Enqueue(4.5f);
+            Assert.False(Validate.ArgsEqual(new object[] { 1, queue1 }, new object[] { 1, queue2 }));
+        }
+
+        [Fact]
+        public void ArgsEqualWithCollectionContentLengthDifferent()
+        {
+            Queue queue1 = new Queue(3);
+            queue1.Enqueue("1");
+            queue1.Enqueue(2);
+            queue1.Enqueue(4.5f);
+            Queue queue2 = new Queue(2);
+            queue2.Enqueue("1");
+            queue2.Enqueue(5);
+            Assert.False(Validate.ArgsEqual(new object[] { 1, queue1 }, new object[] { 1, queue2 }));
+        }
+    }
 }

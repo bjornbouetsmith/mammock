@@ -37,124 +37,125 @@ using Rhino.Mocks.Exceptions;
 namespace Rhino.Mocks.Tests
 {
 
-	public class Metric : IMetric
-	{
-		IApplicationSession m_objIApplicationSession;
-		Metric(IApplicationSession pv_objIApplicationSession, DataSet pv_objDataSet)
-		{
-			m_objIApplicationSession = pv_objIApplicationSession;
-		}
+    public class Metric : IMetric
+    {
+        IApplicationSession m_objIApplicationSession;
+        Metric(IApplicationSession pv_objIApplicationSession, DataSet pv_objDataSet)
+        {
+            m_objIApplicationSession = pv_objIApplicationSession;
+        }
 
 
 
-		public IMetric Numerator
-		{
-			get
-			{
-				return Metric.GetByName(m_objIApplicationSession, "Numerator");
-			}
-		}
+        public IMetric Numerator
+        {
+            get
+            {
+                return Metric.GetByName(m_objIApplicationSession, "Numerator");
+            }
+        }
 
-		public static IMetric GetByName(IApplicationSession pv_objIApplicationSession, string pv_strMetricName)
-		{
-			return new Metric(pv_objIApplicationSession, pv_objIApplicationSession.IMetricBroker.FetchMetric(pv_strMetricName));
-		}
+        public static IMetric GetByName(IApplicationSession pv_objIApplicationSession, string pv_strMetricName)
+        {
+            return new Metric(pv_objIApplicationSession, pv_objIApplicationSession.IMetricBroker.FetchMetric(pv_strMetricName));
+        }
 
-		public static IMetric GetByID(IApplicationSession pv_objIApplicationSession, long pv_lMetricID)
-		{
-			return new Metric(pv_objIApplicationSession, pv_objIApplicationSession.IMetricBroker.FetchMetric(pv_lMetricID));
-		}
-	}
-
-
-	public interface IMetric
-	{
-		IMetric Numerator { get;}
-	}
-
-	public interface IApplicationSession
-	{
-		IMetricBroker IMetricBroker { get;}
-	}
-
-	public interface IMetricBroker
-	{
-		DataSet FetchMetric(string MetricName);
-		DataSet FetchMetric(long MetricID);
-	}
+        public static IMetric GetByID(IApplicationSession pv_objIApplicationSession, long pv_lMetricID)
+        {
+            return new Metric(pv_objIApplicationSession, pv_objIApplicationSession.IMetricBroker.FetchMetric(pv_lMetricID));
+        }
+    }
 
 
+    public interface IMetric
+    {
+        IMetric Numerator { get; }
+    }
 
-	#region TestFixture
-	
-	public class FieldProblem_Owen
-	{
-		MockRepository m_objMockRepository;
-		IApplicationSession m_objIApplication;
-		IMetricBroker m_objIMetricBroker;
+    public interface IApplicationSession
+    {
+        IMetricBroker IMetricBroker { get; }
+    }
 
-		DataSet m_objDSRatioMetric;
+    public interface IMetricBroker
+    {
+        DataSet FetchMetric(string MetricName);
+        DataSet FetchMetric(long MetricID);
+    }
 
-		IMetric m_objIMetric;
 
-		public FieldProblem_Owen()
-		{
-			#region Mock Objects
-			m_objMockRepository = new MockRepository();
-			m_objIApplication = (IApplicationSession)m_objMockRepository.StrictMock(typeof(IApplicationSession));
-			m_objIMetricBroker = (IMetricBroker)m_objMockRepository.StrictMock(typeof(IMetricBroker));
-			#endregion
 
-			#region DataSets
+    #region TestFixture
 
-			m_objDSRatioMetric = new DataSet();
+    public class FieldProblem_Owen
+    {
+        MockRepository m_objMockRepository;
+        IApplicationSession m_objIApplication;
+        IMetricBroker m_objIMetricBroker;
 
-			using (m_objMockRepository.Ordered())
-			{
-				Rhino.Mocks.Expect.Call(m_objIApplication.IMetricBroker).Return(m_objIMetricBroker);
-				Rhino.Mocks.Expect.Call(m_objIMetricBroker.FetchMetric("Risk")).Return(m_objDSRatioMetric);
-			}
-			m_objMockRepository.ReplayAll();
+        DataSet m_objDSRatioMetric;
 
-			#endregion
+        IMetric m_objIMetric;
 
-			m_objIMetric = Metric.GetByName(m_objIApplication, "Risk");
-			m_objMockRepository.VerifyAll();
-		}
-		[Fact]
-		public void T001_SavingShouldNotInvalidateOtherCachedSingleObjects()
-		{
-			m_objMockRepository.BackToRecord(m_objIApplication);
-			m_objMockRepository.BackToRecord(m_objIMetricBroker);
-			long lOtherID = 200;
-			DataSet objDSOtherMetric = new DataSet();
+        public FieldProblem_Owen()
+        {
+            #region Mock Objects
+            m_objMockRepository = new MockRepository();
+            m_objIApplication = (IApplicationSession)m_objMockRepository.StrictMock(typeof(IApplicationSession));
+            m_objIMetricBroker = (IMetricBroker)m_objMockRepository.StrictMock(typeof(IMetricBroker));
+            #endregion
 
-			using (m_objMockRepository.Ordered())
-			{
-				Rhino.Mocks.Expect.Call(m_objIApplication.IMetricBroker).Return(m_objIMetricBroker);
-				Rhino.Mocks.Expect.Call(m_objIMetricBroker.FetchMetric(lOtherID)).Return(objDSOtherMetric);
-			}
-			m_objMockRepository.ReplayAll();
+            #region DataSets
 
-			IMetric objOtherMetric = Metric.GetByID(m_objIApplication, lOtherID);
-			m_objMockRepository.VerifyAll();
+            m_objDSRatioMetric = new DataSet();
 
-			m_objMockRepository.BackToRecord(m_objIApplication);
-			m_objMockRepository.BackToRecord(m_objIMetricBroker);
+            using (m_objMockRepository.Ordered())
+            {
+                Rhino.Mocks.Expect.Call(m_objIApplication.IMetricBroker).Return(m_objIMetricBroker);
+                Rhino.Mocks.Expect.Call(m_objIMetricBroker.FetchMetric("Risk")).Return(m_objDSRatioMetric);
+            }
+            m_objMockRepository.ReplayAll();
 
-			m_objMockRepository.ReplayAll();
-			//missing expectations here. 
+            #endregion
 
-			//cause a stack overflow error
-			
-			Assert.Throws<ExpectationViolationException>("IApplicationSession.get_IMetricBroker(); Expected #0, Actual #1.",
-			                                             () =>
-			                                             {
-															 IMetric objMetric = m_objIMetric.Numerator;
-			                                             });
-		}
+            m_objIMetric = Metric.GetByName(m_objIApplication, "Risk");
+            m_objMockRepository.VerifyAll();
+        }
+        [Fact]
+        public void T001_SavingShouldNotInvalidateOtherCachedSingleObjects()
+        {
+            m_objMockRepository.BackToRecord(m_objIApplication);
+            m_objMockRepository.BackToRecord(m_objIMetricBroker);
+            long lOtherID = 200;
+            DataSet objDSOtherMetric = new DataSet();
 
-	}
+            using (m_objMockRepository.Ordered())
+            {
+                Rhino.Mocks.Expect.Call(m_objIApplication.IMetricBroker).Return(m_objIMetricBroker);
+                Rhino.Mocks.Expect.Call(m_objIMetricBroker.FetchMetric(lOtherID)).Return(objDSOtherMetric);
+            }
+            m_objMockRepository.ReplayAll();
 
-	#endregion
+            IMetric objOtherMetric = Metric.GetByID(m_objIApplication, lOtherID);
+            m_objMockRepository.VerifyAll();
+
+            m_objMockRepository.BackToRecord(m_objIApplication);
+            m_objMockRepository.BackToRecord(m_objIMetricBroker);
+
+            m_objMockRepository.ReplayAll();
+            //missing expectations here. 
+
+            //cause a stack overflow error
+
+            ExpectationViolationException ex = Assert.Throws<ExpectationViolationException>(() =>
+                                                         {
+                                                             IMetric objMetric = m_objIMetric.Numerator;
+                                                         });
+
+            Assert.Equal("IApplicationSession.get_IMetricBroker(); Expected #0, Actual #1.", ex.Message);
+        }
+
+    }
+
+    #endregion
 }

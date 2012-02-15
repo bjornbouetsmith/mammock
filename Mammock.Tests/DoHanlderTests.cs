@@ -118,26 +118,30 @@ namespace Rhino.Mocks.Tests
         [Fact]
         public void InvalidReturnValueThrows()
         {
-        	Assert.Throws<InvalidOperationException>(
-        		"The delegate return value should be assignable from System.Int32",
+        	string expectedMessage="The delegate return value should be assignable from System.Int32";
+InvalidOperationException ex = Assert.Throws<InvalidOperationException>(
         		() => Expect.Call(demo.ReturnIntNoArgs()).Do(new GetDay(GetSunday)));
+Assert.Equal(expectedMessage, ex.Message);
             
         }
 
         [Fact]
         public void InvalidDelegateThrows()
         {
-        	Assert.Throws<InvalidOperationException>("Callback arguments didn't match the method arguments",
+        	string expectedMessage="Callback arguments didn't match the method arguments";
+InvalidOperationException ex = Assert.Throws<InvalidOperationException>(
         	                                         () =>
         	                                         Expect.Call(demo.ReturnIntNoArgs()).Do(new IntDelegate(IntMethod)));
+Assert.Equal(expectedMessage, ex.Message);
         }
 
         [Fact]
         public void CanOnlySpecifyOnce()
         {
-        	Assert.Throws<InvalidOperationException>(
-        		"Can set only a single return value or exception to throw or delegate to execute on the same method call.",
+        	string expectedMessage="Can set only a single return value or exception to throw or delegate to execute on the same method call.";
+InvalidOperationException ex = Assert.Throws<InvalidOperationException>(
         		() => Expect.Call(demo.EnumNoArgs()).Do(new GetDay(ThrowDay)).Return(DayOfWeek.Saturday));
+Assert.Equal(expectedMessage, ex.Message);
         }
 
         public delegate DayOfWeek GetDay();

@@ -1,9 +1,9 @@
 function Get-Git-Commit
 {
 	$gitLog = git log --oneline -1
+	Write-Host $gitLog
 	return $gitLog.Split(' ')[0]
 }
-
 function Generate-Assembly-Info
 {
 param(
@@ -17,13 +17,12 @@ param(
 	[string]$file = $(throw "file is a required parameter."),
 	[string]$internalsVisibleTo
 )
-  $commit = Get-Git-Commit
   $asmInfo = "using System;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-[assembly: CLSCompliantAttribute($clsCompliant )]
+[assembly: CLSCompliantAttribute($clsCompliant)]
 [assembly: ComVisibleAttribute(false)]
 [assembly: AssemblyTitleAttribute(""$title"")]
 [assembly: AssemblyDescriptionAttribute(""$description"")]
@@ -31,9 +30,11 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyProductAttribute(""$product"")]
 [assembly: AssemblyCopyrightAttribute(""$copyright"")]
 [assembly: AssemblyVersionAttribute(""$version"")]
-[assembly: AssemblyInformationalVersionAttribute(""$version / $commit"")]
+[assembly: AssemblyInformationalVersionAttribute(""$version"")]
 [assembly: AssemblyFileVersionAttribute(""$version"")]
 [assembly: AssemblyDelaySignAttribute(false)]
+[assembly: InternalsVisibleTo(""DynamicProxyGenAssembly2"")]
+[assembly: InternalsVisibleTo(""MammockDelegateDynamicAssembly"")]
 [assembly: InternalsVisibleTo(""$internalsVisibleTo"")]
 "
 

@@ -9,7 +9,7 @@ namespace Rhino.Mocks.Tests.FieldsProblem
 	
 	public class FieldProblem_Andrew
 	{
-#if DOTNET35
+
 		[Fact]
 		public void Will_get_unexpect_error()
 		{
@@ -29,9 +29,11 @@ namespace Rhino.Mocks.Tests.FieldsProblem
 			{
 			}
 
-			Assert.Throws<ExpectationViolationException>("IDbCommand.set_Connection(null); Expected #1, Actual #0.", () => mockCommand.VerifyAllExpectations());
+			string expectedMessage="IDbCommand.set_Connection(null); Expected #1, Actual #0.";
+ExpectationViolationException ex = Assert.Throws<ExpectationViolationException>( () => mockCommand.VerifyAllExpectations());
+Assert.Equal(expectedMessage, ex.Message);
 		}
-#endif
+
 	}
 
 	public class TestException : Exception

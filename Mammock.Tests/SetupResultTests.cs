@@ -33,17 +33,17 @@ using Rhino.Mocks.Exceptions;
 
 namespace Rhino.Mocks.Tests
 {
-	
-	public class SetupResultTests
-	{
-		private MockRepository mocks;
-		private IDemo demo;
 
-		public SetupResultTests()
-		{
-			mocks = new MockRepository();
-			demo = mocks.StrictMock(typeof (IDemo)) as IDemo;
-		}
+    public class SetupResultTests
+    {
+        private MockRepository mocks;
+        private IDemo demo;
+
+        public SetupResultTests()
+        {
+            mocks = new MockRepository();
+            demo = mocks.StrictMock(typeof(IDemo)) as IDemo;
+        }
 
         [Fact]
         public void CanSetupResultForMethodAndIgnoreArgs()
@@ -53,97 +53,95 @@ namespace Rhino.Mocks.Tests
             Assert.Equal("Ayende", demo.StringArgString("a"));
             Assert.Equal("Ayende", demo.StringArgString("b"));
             mocks.VerifyAll();
-            
+
         }
-	    
-		[Fact]
-		public void CanSetupResult()
-		{
-			SetupResult.For(demo.Prop).Return("Ayende");
-			mocks.ReplayAll();
-			Assert.Equal("Ayende", demo.Prop);
+
+        [Fact]
+        public void CanSetupResult()
+        {
+            SetupResult.For(demo.Prop).Return("Ayende");
+            mocks.ReplayAll();
+            Assert.Equal("Ayende", demo.Prop);
             mocks.VerifyAll();
-		    
-		}
 
-		[Fact]
-		public void SetupResultForNoCall()
-		{
-			Assert.Throws<InvalidOperationException>(
-				"Invalid call, the last call has been used or no call has been made (make sure that you are calling a virtual (C#) / Overridable (VB) method).",
-				() => SetupResult.For<object>(null));
-		}
+        }
 
-		[Fact]
-		public void SetupResultCanRepeatAsManyTimeAsItWant()
-		{
-			SetupResult.For(demo.Prop).Return("Ayende");
-			mocks.ReplayAll();
-			for (int i = 0; i < 30; i++)
-			{
-				Assert.Equal("Ayende", demo.Prop);
-			}
+        [Fact]
+        public void SetupResultCanRepeatAsManyTimeAsItWant()
+        {
+            SetupResult.For(demo.Prop).Return("Ayende");
+            mocks.ReplayAll();
+            for (int i = 0; i < 30; i++)
+            {
+                Assert.Equal("Ayende", demo.Prop);
+            }
             mocks.VerifyAll();
-		    
-		}
 
-		[Fact]
-		public void SetupResultUsingOn()
-		{
-			SetupResult.On(demo).Call(demo.Prop).Return("Ayende");
-			mocks.ReplayAll();
-			for (int i = 0; i < 30; i++)
-			{
-				Assert.Equal("Ayende", demo.Prop);
-			}
+        }
+
+        [Fact]
+        public void SetupResultUsingOn()
+        {
+            SetupResult.On(demo).Call(demo.Prop).Return("Ayende");
+            mocks.ReplayAll();
+            for (int i = 0; i < 30; i++)
+            {
+                Assert.Equal("Ayende", demo.Prop);
+            }
             mocks.VerifyAll();
-		    
-		}
 
-		[Fact]
-		public void SetupResultUsingOrdered()
-		{
-			SetupResult.On(demo).Call(demo.Prop).Return("Ayende");
-			using (mocks.Ordered())
-			{
-				demo.VoidNoArgs();
-				LastCall.On(demo).Repeat.Twice();
-			}
-			mocks.ReplayAll();
-			demo.VoidNoArgs();
-			for (int i = 0; i < 30; i++)
-			{
-				Assert.Equal("Ayende", demo.Prop);
-			}
-			demo.VoidNoArgs();
+        }
+
+        [Fact]
+        public void SetupResultUsingOrdered()
+        {
+            SetupResult.On(demo).Call(demo.Prop).Return("Ayende");
+            using (mocks.Ordered())
+            {
+                demo.VoidNoArgs();
+                LastCall.On(demo).Repeat.Twice();
+            }
+            mocks.ReplayAll();
+            demo.VoidNoArgs();
+            for (int i = 0; i < 30; i++)
+            {
+                Assert.Equal("Ayende", demo.Prop);
+            }
+            demo.VoidNoArgs();
             mocks.VerifyAll();
-		    
-		}
 
-		[Fact]
-		public void SetupResultForTheSameMethodTwiceCauseExcetion()
-		{
-			SetupResult.On(demo).Call(demo.Prop).Return("Ayende");
-			Assert.Throws<InvalidOperationException>( "The result for IDemo.get_Prop(); has already been setup.", () => SetupResult.On(demo).Call(demo.Prop).Return("Ayende"));
-		}
+        }
 
-		[Fact]
-		public void ExpectNever()
-		{
-			demo.ReturnStringNoArgs();
-			LastCall.Repeat.Never();
-			mocks.ReplayAll();
-			Assert.Throws<ExpectationViolationException>("IDemo.ReturnIntNoArgs(); Expected #0, Actual #1.", () => demo.ReturnIntNoArgs());
-		}
+        [Fact]
+        public void SetupResultForTheSameMethodTwiceCauseExcetion()
+        {
+            SetupResult.On(demo).Call(demo.Prop).Return("Ayende");
+            string expectedMessage = "The result for IDemo.get_Prop(); has already been setup.";
+            InvalidOperationException ex = Assert.Throws<InvalidOperationException>(() => SetupResult.On(demo).Call(demo.Prop).Return("Ayende"));
+            Assert.Equal(expectedMessage, ex.Message);
+        }
 
-		[Fact]
-		public void ExpectNeverSetupTwiceThrows()
-		{
-			demo.ReturnStringNoArgs();
-			LastCall.Repeat.Never();
-			demo.ReturnStringNoArgs();
-			Assert.Throws<InvalidOperationException>("The result for IDemo.ReturnStringNoArgs(); has already been setup.", () => LastCall.Repeat.Never());
-			
-		}
-	}
+        [Fact]
+        public void ExpectNever()
+        {
+            demo.ReturnStringNoArgs();
+            LastCall.Repeat.Never();
+            mocks.ReplayAll();
+            string expectedMessage = "IDemo.ReturnIntNoArgs(); Expected #0, Actual #1.";
+            ExpectationViolationException ex = Assert.Throws<ExpectationViolationException>(() => demo.ReturnIntNoArgs());
+            Assert.Equal(expectedMessage, ex.Message);
+        }
+
+        [Fact]
+        public void ExpectNeverSetupTwiceThrows()
+        {
+            demo.ReturnStringNoArgs();
+            LastCall.Repeat.Never();
+            demo.ReturnStringNoArgs();
+            string expectedMessage = "The result for IDemo.ReturnStringNoArgs(); has already been setup.";
+            InvalidOperationException ex = Assert.Throws<InvalidOperationException>(() => LastCall.Repeat.Never());
+            Assert.Equal(expectedMessage, ex.Message);
+
+        }
+    }
 }

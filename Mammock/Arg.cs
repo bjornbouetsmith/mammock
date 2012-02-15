@@ -1,7 +1,7 @@
 using System;
-#if DOTNET35
+
 using System.Linq.Expressions;
-#endif
+
 using Rhino.Mocks.Constraints;
 
 namespace Rhino.Mocks
@@ -22,7 +22,7 @@ namespace Rhino.Mocks
 	public static class Arg<T>
     {
 
-#if DOTNET35
+
 
         /// <summary>
 		/// Register the predicate as a constraint for the current call.
@@ -40,7 +40,7 @@ namespace Rhino.Mocks
 			ArgManager.AddInArgument(new LambdaConstraint(predicate));
 			return default(T);
 		}
-#else
+
 		/// <summary>
 		/// Register the predicate as a constraint for the current call.
 		/// </summary>
@@ -57,7 +57,7 @@ namespace Rhino.Mocks
 			ArgManager.AddInArgument(Rhino.Mocks.Constraints.Is.Matching<TPredicate>(predicate));
 			return default(T);
 		}
-#endif
+
 
 		/// <summary>
 		/// Define a simple constraint for this argument. (Use Matches in simple cases.)

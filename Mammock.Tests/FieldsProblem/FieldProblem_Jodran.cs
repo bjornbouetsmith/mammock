@@ -26,11 +26,14 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
 
-#if DOTNET35
-
+// TODO: Find newer version of xunit extensions or rewrite tests.
+/*
+using NUnit.Framework;
 using Xunit;
 using Rhino.Mocks.Exceptions;
 using Xunit.Extensions;
+using Assert = Xunit.Assert;
+using Theory = Xunit.Extensions.TheoryAttribute;
 
 namespace Rhino.Mocks.Tests.FieldsProblem
 {
@@ -151,4 +154,5 @@ namespace Rhino.Mocks.Tests.FieldsProblem
         }
 	}
 }
-#endif
+
+*/

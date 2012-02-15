@@ -61,22 +61,28 @@ namespace Rhino.Mocks.Tests
         [Fact]
         public void ExceptionIfLastMethodCallIsNotProperty()
         {
-        	Assert.Throws<InvalidOperationException>("Last method call was not made on a setter or a getter",
+        	string expectedMessage="Last method call was not made on a setter or a getter";
+InvalidOperationException ex = Assert.Throws<InvalidOperationException>(
         	                                         () => Expect.Call(demo.EnumNoArgs()).PropertyBehavior());
+Assert.Equal(expectedMessage, ex.Message);
         }
 
         [Fact]
         public void ExceptionIfPropHasOnlyGetter()
         {
-        	Assert.Throws<InvalidOperationException>("Property must be read/write",
+        	string expectedMessage="Property must be read/write";
+InvalidOperationException ex = Assert.Throws<InvalidOperationException>(
         	                                         () => Expect.Call(demo.ReadOnly).PropertyBehavior());
+Assert.Equal(expectedMessage, ex.Message);
         }
 
         [Fact]
         public void ExceptionIfPropHasOnlySetter()
         {
-        	Assert.Throws<InvalidOperationException>("Property must be read/write",
+        	string expectedMessage="Property must be read/write";
+InvalidOperationException ex = Assert.Throws<InvalidOperationException>(
         	                                         () => Expect.Call(demo.WriteOnly).PropertyBehavior());
+Assert.Equal(expectedMessage, ex.Message);
         }
 
         [Fact]
@@ -106,9 +112,10 @@ namespace Rhino.Mocks.Tests
             IWithIndexers x = (IWithIndexers)mocks.StrictMock(typeof(IWithIndexers));
             Expect.Call(x[1]).PropertyBehavior();
             mocks.ReplayAll();
-        	Assert.Throws<InvalidOperationException>(
-        		"Can't return a value for property Item because no value was set and the Property return a value type.",
+        	string expectedMessage="Can't return a value for property Item because no value was set and the Property return a value type.";
+InvalidOperationException ex = Assert.Throws<InvalidOperationException>(
         		() => GC.KeepAlive(x[1]));
+Assert.Equal(expectedMessage, ex.Message);
         }
 
         [Fact]

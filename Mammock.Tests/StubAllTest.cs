@@ -153,8 +153,9 @@ namespace Rhino.Mocks.Tests
         [Fact]
         public void StubCanHandlePolymorphicArgConstraints()
         {
+            
             IAquarium aquarium = MockRepository.GenerateStub<IAquarium>();
-            aquarium.Stub(x => x.DetermineAge(Arg<MartianFish>.Matches<MartianFish>(arg => arg.Planet == "mars"))).Return(100);
+            aquarium.Stub(x => x.DetermineAge(Arg<MartianFish>.Matches(arg => arg.Planet == "mars"))).Return(100);
             aquarium.Stub(x => x.DetermineAge(Arg<SpecificFish>.Is.TypeOf)).Return(5);
 
             Assert.False(typeof(MartianFish).IsAssignableFrom(typeof(SpecificFish)));

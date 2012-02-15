@@ -28,6 +28,7 @@
 
 
 using System;
+using Castle.DynamicProxy;
 using Rhino.Mocks.Interfaces;
 
 namespace Rhino.Mocks.Tests
@@ -37,7 +38,7 @@ namespace Rhino.Mocks.Tests
     
     public class CallOriginalMethodTests
     {
-
+        
         [Fact]
         public void CallOriginalMethodOnPropGetAndSet()
         {
@@ -63,9 +64,10 @@ namespace Rhino.Mocks.Tests
         {
             MockRepository mocks = new MockRepository();
             IDemo demo = (IDemo)mocks.StrictMock(typeof(IDemo));
-        	Assert.Throws<InvalidOperationException>(
-        		"Can't use CallOriginalMethod on method ReturnIntNoArgs because the method is abstract.",
+        	string expectedMessage="Can't use CallOriginalMethod on method ReturnIntNoArgs because the method is abstract.";
+InvalidOperationException ex = Assert.Throws<InvalidOperationException>(
         		() => SetupResult.For(demo.ReturnIntNoArgs()).CallOriginalMethod(OriginalCallOptions.CreateExpectation));
+Assert.Equal(expectedMessage, ex.Message);
         }
 
         [Fact]
@@ -73,9 +75,10 @@ namespace Rhino.Mocks.Tests
         {
             MockRepository mocks = new MockRepository();
             MockingClassesTests.AbstractDemo demo = (MockingClassesTests.AbstractDemo)mocks.StrictMock(typeof(MockingClassesTests.AbstractDemo));
-        	Assert.Throws<InvalidOperationException>(
-        		"Can't use CallOriginalMethod on method Six because the method is abstract.",
+        	string expectedMessage="Can't use CallOriginalMethod on method Six because the method is abstract.";
+InvalidOperationException ex = Assert.Throws<InvalidOperationException>(
         		() => SetupResult.For(demo.Six()).CallOriginalMethod(OriginalCallOptions.CreateExpectation));
+Assert.Equal(expectedMessage, ex.Message);
         }
 
     }

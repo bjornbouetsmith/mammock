@@ -24,13 +24,15 @@ namespace Rhino.Mocks.Tests.FieldsProblem
 				customer.IsPreferred = true;
 			}
 
-			Assert.Throws<ExpectationViolationException>("Unordered method call! The expected call is: 'Ordered: { ICustomer.get_Id(); }' but was: 'ICustomer.set_IsPreferred(True);'", () =>
+            ExpectationViolationException ex = Assert.Throws<ExpectationViolationException>(() =>
 			{
 				using (mocks.Playback())
 				{
 					mapper.MarkCustomerAsPreferred(customer);
 				}
 			});
+
+            Assert.Equal("Unordered method call! The expected call is: 'Ordered: { ICustomer.get_Id(); }' but was: 'ICustomer.set_IsPreferred(True);'", ex.Message);
 		}
 	}
 

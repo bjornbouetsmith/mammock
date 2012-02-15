@@ -3,89 +3,92 @@ using Rhino.Mocks.Exceptions;
 
 namespace Rhino.Mocks.Tests
 {
-	
-	public class PropertySetterFixture
-	{
-		[Fact]
-		public void Setter_Expectation_With_Custom_Ignore_Arguments()
-		{
-			MockRepository mocks = new MockRepository();
 
-			IBar bar = mocks.StrictMock<IBar>();
+    public class PropertySetterFixture
+    {
+        [Fact]
+        public void Setter_Expectation_With_Custom_Ignore_Arguments()
+        {
+            MockRepository mocks = new MockRepository();
 
-			using(mocks.Record())
-			{
-				Expect.Call(bar.Foo).SetPropertyAndIgnoreArgument();
-			}
+            IBar bar = mocks.StrictMock<IBar>();
 
-			using(mocks.Playback())
-			{
-				bar.Foo = 2;
-			}
+            using (mocks.Record())
+            {
+                Expect.Call(bar.Foo).SetPropertyAndIgnoreArgument();
+            }
 
-			mocks.VerifyAll();
-		}
+            using (mocks.Playback())
+            {
+                bar.Foo = 2;
+            }
 
-		[Fact]
-		public void Setter_Expectation_Not_Fullfilled()
-		{
-			MockRepository mocks = new MockRepository();
+            mocks.VerifyAll();
+        }
 
-			IBar bar = mocks.StrictMock<IBar>();
+        [Fact]
+        public void Setter_Expectation_Not_Fullfilled()
+        {
+            MockRepository mocks = new MockRepository();
 
-			using (mocks.Record())
-			{
-				Expect.Call(bar.Foo).SetPropertyAndIgnoreArgument();
-			}
+            IBar bar = mocks.StrictMock<IBar>();
 
-			Assert.Throws<ExpectationViolationException>("IBar.set_Foo(any); Expected #1, Actual #0.", () =>
-			{
-				using (mocks.Playback())
-				{
-				}
-			});
-		}
+            using (mocks.Record())
+            {
+                Expect.Call(bar.Foo).SetPropertyAndIgnoreArgument();
+            }
 
-		[Fact]
-		public void Setter_Expectation_With_Correct_Argument()
-		{
-			MockRepository mocks = new MockRepository();
+            ExpectationViolationException ex = Assert.Throws<ExpectationViolationException>(() =>
+            {
+                using (mocks.Playback())
+                {
+                }
+            });
 
-			IBar bar = mocks.StrictMock<IBar>();
+            Assert.Equal("IBar.set_Foo(any); Expected #1, Actual #0.", ex.Message);
+        }
 
-			using (mocks.Record())
-			{
-				Expect.Call(bar.Foo).SetPropertyWithArgument(1);
-			}
+        [Fact]
+        public void Setter_Expectation_With_Correct_Argument()
+        {
+            MockRepository mocks = new MockRepository();
 
-			using (mocks.Playback())
-			{
-				bar.Foo = 1;
-			}
+            IBar bar = mocks.StrictMock<IBar>();
 
-			mocks.VerifyAll();
-		}
+            using (mocks.Record())
+            {
+                Expect.Call(bar.Foo).SetPropertyWithArgument(1);
+            }
 
-		[Fact]
-		public void Setter_Expectation_With_Wrong_Argument()
-		{
-			MockRepository mocks = new MockRepository();
+            using (mocks.Playback())
+            {
+                bar.Foo = 1;
+            }
 
-			IBar bar = mocks.StrictMock<IBar>();
+            mocks.VerifyAll();
+        }
 
-			using (mocks.Record())
-			{
-				Expect.Call(bar.Foo).SetPropertyWithArgument(1);
-			}
+        [Fact]
+        public void Setter_Expectation_With_Wrong_Argument()
+        {
+            MockRepository mocks = new MockRepository();
 
-			mocks.Playback();
-			Assert.Throws<ExpectationViolationException>(
-				"IBar.set_Foo(0); Expected #0, Actual #1.\r\nIBar.set_Foo(1); Expected #1, Actual #0.", () => { bar.Foo = 0; });
-		}
-	}
+            IBar bar = mocks.StrictMock<IBar>();
 
-	public interface IBar
-	{
-		int Foo { get; set; }
-	}
+            using (mocks.Record())
+            {
+                Expect.Call(bar.Foo).SetPropertyWithArgument(1);
+            }
+
+            mocks.Playback();
+            string expectedMessage = "IBar.set_Foo(0); Expected #0, Actual #1.\r\nIBar.set_Foo(1); Expected #1, Actual #0.";
+            ExpectationViolationException ex = Assert.Throws<ExpectationViolationException>(() => { bar.Foo = 0; });
+            Assert.Equal(expectedMessage, ex.Message);
+        }
+    }
+
+    public interface IBar
+    {
+        int Foo { get; set; }
+    }
 }

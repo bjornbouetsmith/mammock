@@ -1,4 +1,4 @@
-#if DOTNET35
+
 using System;
 using System.Collections.Generic;
 using System.ServiceModel;
@@ -42,4 +42,4 @@ namespace Rhino.Mocks.Tests.FieldsProblem
     }
 }
 
-#endif
+

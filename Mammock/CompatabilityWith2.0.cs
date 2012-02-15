@@ -7,7 +7,6 @@ namespace Rhino.Mocks
     /// </summary>
     public delegate R Function<T, R>(T t);
 
-#if FOR_NET_2_0
     ///<summary>
     /// This is here to allow compiling on the 2.0 platform with extension methods
     ///</summary>
@@ -16,5 +15,5 @@ namespace Rhino.Mocks
     {
     }
   
-#endif
+
 }

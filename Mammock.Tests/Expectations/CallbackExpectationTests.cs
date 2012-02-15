@@ -64,13 +64,13 @@ namespace Rhino.Mocks.Tests.Expectations
 		[Fact]
 		public void ExceptionWhenArgsDontMatch()
 		{
-			Assert.Throws<InvalidOperationException>("Callback arguments didn't match the method arguments",
-			                                         () =>
+            InvalidOperationException ex = Assert.Throws<InvalidOperationException>(() =>
 			                                         callback =
 			                                         new CallbackExpectation(new FakeInvocation(method),
 			                                                                 new DelegateDefinations.NoArgsDelegate(VoidNoArgs),
 			                                                                 new Range(1, 1))
 				);
+            Assert.Equal("Callback arguments didn't match the method arguments", ex.Message);
 		}
 
 		[Fact]
@@ -84,29 +84,34 @@ namespace Rhino.Mocks.Tests.Expectations
 		[Fact]
 		public void CallbackDoesntReturnBool()
 		{
-			Assert.Throws<InvalidOperationException>("Callbacks must return a boolean", 
+			string expectedMessage="Callbacks must return a boolean";
+InvalidOperationException ex = Assert.Throws<InvalidOperationException>( 
 				() =>
 				new CallbackExpectation(new FakeInvocation(method), new DelegateDefinations.VoidThreeArgsDelegate(VoidThreeArgsDelegateMethod), new Range(1, 1)));
+Assert.Equal(expectedMessage, ex.Message);
 		}
 
 		[Fact]
 		public void CallbackWithDifferentSignature_NumArgsDifferent()
 		{
-			Assert.Throws<InvalidOperationException>("Callback arguments didn't match the method arguments",
+			string expectedMessage="Callback arguments didn't match the method arguments";
+InvalidOperationException ex = Assert.Throws<InvalidOperationException>(
 			                                         () =>
 													 new CallbackExpectation(new FakeInvocation(method), new DelegateDefinations.StringDelegate("".StartsWith), new Range(1, 1)));
+Assert.Equal(expectedMessage, ex.Message);
 		}
 
 		[Fact]
 		public void CallBackWithDifferentSignature()
 		{
-			Assert.Throws<InvalidOperationException>(
-				"Callback arguments didn't match the method arguments",
+            InvalidOperationException ex = Assert.Throws<InvalidOperationException>(
 				() =>
 					callback = new CallbackExpectation(
 						new FakeInvocation(method), 
 						new DelegateDefinations.IntArgDelegate(OneArg), 
 						new Range(1, 1)));
+
+            Assert.Equal("Callback arguments didn't match the method arguments", ex.Message);
 		}
 
 		#region Implementation

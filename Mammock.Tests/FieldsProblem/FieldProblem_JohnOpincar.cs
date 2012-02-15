@@ -58,9 +58,10 @@ namespace Rhino.Mocks.Tests.FieldsProblem
 			//LastCall.IgnoreArguments(); 
 			m_mocks.ReplayAll(); 
 			//presenter.Initialize(); 
-			Assert.Throws<ExpectationViolationException>(
-				"IDaSchedulerView.set_DateOf(08/08/2006 00:00:00); Expected #1, Actual #0.",
+			string expectedMessage="IDaSchedulerView.set_DateOf(08/08/2006 00:00:00); Expected #1, Actual #0.";
+ExpectationViolationException ex = Assert.Throws<ExpectationViolationException>(
 				() => m_mocks.VerifyAll());
+Assert.Equal(expectedMessage, ex.Message);
 		}
 	}
 }

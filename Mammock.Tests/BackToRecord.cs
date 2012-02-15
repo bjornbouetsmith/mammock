@@ -36,7 +36,7 @@ using Rhino.Mocks.Tests.FieldsProblem;
 
 namespace Rhino.Mocks.Tests
 {
-    
+
     public class BackToRecord
     {
         [Fact]
@@ -60,7 +60,7 @@ namespace Rhino.Mocks.Tests
             MockRepository mocks = new MockRepository();
             IDemo demo = (IDemo)mocks.StrictMock(typeof(IDemo));
             Expect.Call(demo.Prop).Return("ayende");
-            
+
             mocks.Replay(demo);
             Assert.Equal("ayende", demo.Prop);
             mocks.VerifyAll();
@@ -72,7 +72,7 @@ namespace Rhino.Mocks.Tests
             Assert.Equal("rahien", demo.Prop);
             mocks.VerifyAll();
         }
-    
+
         [Fact]
         public void CanSpecifyClearOnlyEvents()
         {
@@ -97,9 +97,10 @@ namespace Rhino.Mocks.Tests
             mocks.BackToRecord(abstractClass, BackToRecordOptions.OriginalMethodsToCall);
             mocks.ReplayAll();
 
-        	Assert.Throws<ExpectationViolationException>(
-        		"AbstractClass.Add(5); Expected #0, Actual #1.",
-        		() => abstractClass.Add(5));
+            string expectedMessage = "AbstractClass.Add(5); Expected #0, Actual #1.";
+            ExpectationViolationException ex = Assert.Throws<ExpectationViolationException>(
+                            () => abstractClass.Add(5));
+            Assert.Equal(expectedMessage, ex.Message);
         }
 
         [Fact]
@@ -109,14 +110,16 @@ namespace Rhino.Mocks.Tests
             IDemo mock = mocks.StrictMock<IDemo>();
             Expect.Call(mock.Prop).PropertyBehavior();
 
-            mocks.BackToRecord(mock,BackToRecordOptions.PropertyBehavior);
+            mocks.BackToRecord(mock, BackToRecordOptions.PropertyBehavior);
 
             mocks.ReplayAll();
 
-        	Assert.Throws<ExpectationViolationException>("IDemo.get_Prop(); Expected #0, Actual #1.", delegate
-        	{
-        		string prop = mock.Prop;
-        	});
+            ExpectationViolationException ex = Assert.Throws<ExpectationViolationException>(delegate
+            {
+                string prop = mock.Prop;
+            });
+
+            Assert.Equal("IDemo.get_Prop(); Expected #0, Actual #1.", ex.Message);
         }
 
         [Fact]
@@ -129,15 +132,16 @@ namespace Rhino.Mocks.Tests
             mocks.ReplayAll();
 
             mocks.BackToRecord(mock, BackToRecordOptions.None);
-            
+
             mock.VoidNoArgs();
             mocks.ReplayAll();
 
             mock.VoidNoArgs();
 
-        	Assert.Throws<ExpectationViolationException>(
-        		"IDemo.VoidNoArgs(); Expected #1, Actual #0.",
-        		() => mocks.VerifyAll());
+            string expectedMessage = "IDemo.VoidNoArgs(); Expected #1, Actual #0.";
+            ExpectationViolationException ex = Assert.Throws<ExpectationViolationException>(
+                            () => mocks.VerifyAll());
+            Assert.Equal(expectedMessage, ex.Message);
         }
 
         [Fact]

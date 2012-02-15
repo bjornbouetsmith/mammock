@@ -33,6 +33,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 using System.Threading;
 using Castle.DynamicProxy;
+using Rhino.Mocks.Interfaces;
 
 namespace Rhino.Mocks.Impl
 {
@@ -42,15 +43,21 @@ namespace Rhino.Mocks.Impl
     /// </summary>
     internal class DelegateTargetInterfaceCreator
     {
-        private long counter=0;
+        private long counter;
+
+        private readonly AssemblyName assemblyName = new AssemblyName("MammockDelegateDynamicAssembly");
+        private readonly AssemblyBuilder assemblyBuilder;
         
-        /// <summary>
-        /// The scope for all the delegate interfaces create by this mock repository.
-        /// </summary>
-        private ModuleScope moduleScope = new ModuleScope();
+        private readonly ModuleBuilder moduleBuilder;
 
         private IDictionary delegateTargetInterfaces = new Hashtable();
-        
+
+        public DelegateTargetInterfaceCreator()
+        {
+            assemblyBuilder = AppDomain.CurrentDomain.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
+            moduleBuilder = assemblyBuilder.DefineDynamicModule(assemblyName.Name);
+        }
+
         /// <summary>
         /// Gets a type with an "Invoke" method suitable for use as a target of the
         /// specified delegate type.
@@ -72,12 +79,12 @@ namespace Rhino.Mocks.Impl
             }
             return type;
         }
-        
+
         private Type CreateCallableInterfaceFromDelegate(Type delegateType)
         {
             Type type;
             long count = Interlocked.Increment(ref counter);
-            TypeBuilder typeBuilder = moduleScope.ObtainDynamicModule(true).DefineType(
+            TypeBuilder typeBuilder = moduleBuilder.DefineType(
                 string.Format("ProxyDelegate_{0}_{1}", delegateType.Name, count),
                 TypeAttributes.Interface | TypeAttributes.Abstract | TypeAttributes.Public);
 
@@ -87,11 +94,13 @@ namespace Rhino.Mocks.Impl
             Type returnType = invoke.ReturnType;
             Type[] parameterTypes = new Type[parameters.Length];
             for (int i = 0; i < parameters.Length; i++)
+            {
                 parameterTypes[i] = parameters[i].ParameterType;
+            }
 
-            typeBuilder.DefineMethod("Invoke", MethodAttributes.Abstract | MethodAttributes.Virtual | MethodAttributes.Public,
-                                     CallingConventions.HasThis, returnType, parameterTypes);
+            typeBuilder.DefineMethod("Invoke", MethodAttributes.Abstract | MethodAttributes.Virtual | MethodAttributes.Public, CallingConventions.HasThis, returnType, parameterTypes);
 
+            //typeBuilder.AddInterfaceImplementation(typeof(IMockedObject));
             type = typeBuilder.CreateType();
             return type;
         }

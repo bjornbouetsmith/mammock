@@ -32,40 +32,40 @@ using System.Collections.Generic;
 
 namespace Rhino.Mocks.Interfaces
 {
-	using System.Reflection;
+    using System.Reflection;
 
-	/// <summary>
-	/// Interface to find the repository of a mocked object
-	/// </summary>
-	public interface IMockedObject
-	{
+    /// <summary>
+    /// Interface to find the repository of a mocked object
+    /// </summary>
+    public interface IMockedObject
+    {
         /// <summary>
         /// Mocks that are tied to this mock lifestyle
         /// </summary>
         IList<IMockedObject> DependentMocks { get; }
 
-		/// <summary>
-		/// The unique hash code of this mock, which is not related
-		/// to the value of the GetHashCode() call on the object.
-		/// </summary>
-		int ProxyHash { get; }
+        /// <summary>
+        /// The unique hash code of this mock, which is not related
+        /// to the value of the GetHashCode() call on the object.
+        /// </summary>
+        int ProxyHash { get; }
 
-		/// <summary>
-		/// Gets the repository.
-		/// </summary>
-		MockRepository Repository { get; }
+        /// <summary>
+        /// Gets the repository.
+        /// </summary>
+        MockRepository Repository { get; }
 
-		/// <summary>
-		/// Return true if it should call the original method on the object
-		/// instead of pass it to the message chain.
-		/// </summary>
-		/// <param name="method">The method to call</param>
-		bool ShouldCallOriginal(MethodInfo method);
+        /// <summary>
+        /// Return true if it should call the original method on the object
+        /// instead of pass it to the message chain.
+        /// </summary>
+        /// <param name="method">The method to call</param>
+        bool ShouldCallOriginal(MethodInfo method);
 
-		/// <summary>
-		/// Register a method to be called on the object directly
-		/// </summary>
-		void RegisterMethodForCallingOriginal(MethodInfo method);
+        /// <summary>
+        /// Register a method to be called on the object directly
+        /// </summary>
+        void RegisterMethodForCallingOriginal(MethodInfo method);
 
         /// <summary>
         /// Register a property on the object that will behave as a simple property
@@ -93,46 +93,46 @@ namespace Rhino.Mocks.Interfaces
         Delegate GetEventSubscribers(string eventName);
 
 
-		/// <summary>
-		/// Gets the declaring type of the method, taking into acccount the possible generic 
-		/// parameters that it was created with.
-		/// </summary>
-		Type GetDeclaringType(MethodInfo info);
+        /// <summary>
+        /// Gets the declaring type of the method, taking into acccount the possible generic 
+        /// parameters that it was created with.
+        /// </summary>
+        Type GetDeclaringType(MethodInfo info);
 
-		/// <summary>
-		/// Clears the state of the object, remove original calls, property behavior, subscribed events, etc.
-		/// </summary>
-		void ClearState(BackToRecordOptions options);
+        /// <summary>
+        /// Clears the state of the object, remove original calls, property behavior, subscribed events, etc.
+        /// </summary>
+        void ClearState(BackToRecordOptions options);
 
-		/// <summary>
-		/// Gets the implemented types by this mocked object
-		/// </summary>
-		/// <value>The implemented.</value>
-		Type[] ImplementedTypes { get; }
+        /// <summary>
+        /// Gets the implemented types by this mocked object
+        /// </summary>
+        /// <value>The implemented.</value>
+        Type[] ImplementedTypes { get; }
 
-		/// <summary>
-		/// Gets or sets the constructor arguments.
-		/// </summary>
-		/// <value>The constructor arguments.</value>
-	    object[] ConstructorArguments { get; set; }
+        /// <summary>
+        /// Gets or sets the constructor arguments.
+        /// </summary>
+        /// <value>The constructor arguments.</value>
+        object[] ConstructorArguments { get; set; }
 
         /// <summary>
         /// The mocked instance that this is representing
         /// </summary>
-	    object MockedObjectInstance { get; set; }
+        object MockedObjectInstance { get; set; }
 
-	    /// <summary>
+        /// <summary>
         /// Get all the method calls arguments that were made against this object with the specificed 
         /// method.
         /// </summary>
         /// <remarks>
         /// Only method calls in replay mode are counted
         /// </remarks>
-	    ICollection<object[]> GetCallArgumentsFor(MethodInfo method);
+        ICollection<object[]> GetCallArgumentsFor(MethodInfo method);
 
         /// <summary>
         /// Records the method call
         /// </summary>
-	    void MethodCall(MethodInfo method, object[] args);
-	}
+        void MethodCall(MethodInfo method, object[] args);
+    }
 }

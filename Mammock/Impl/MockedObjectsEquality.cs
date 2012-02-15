@@ -35,49 +35,49 @@ using System.Collections.Generic;
 
 namespace Rhino.Mocks.Impl
 {
-	/// <summary>
-	/// This class will provide hash code for hashtables without needing
-	/// to call the GetHashCode() on the object, which may very well be mocked.
-	/// This class has no state so it is a singelton to avoid creating a lot of objects 
-	/// that does the exact same thing. See flyweight patterns.
-	/// </summary>
+    /// <summary>
+    /// This class will provide hash code for hashtables without needing
+    /// to call the GetHashCode() on the object, which may very well be mocked.
+    /// This class has no state so it is a singelton to avoid creating a lot of objects 
+    /// that does the exact same thing. See flyweight patterns.
+    /// </summary>
     public class MockedObjectsEquality : IComparer, IEqualityComparer, IEqualityComparer<object>
-	{
-		private static readonly MockedObjectsEquality instance = new MockedObjectsEquality();
+    {
+        private static readonly MockedObjectsEquality instance = new MockedObjectsEquality();
 
-		private static int baseHashcode = 0;
+        private static int baseHashcode = 0;
 
-		/// <summary>
-		/// The next hash code value for a mock object.
-		/// This is safe for multi threading.
-		/// </summary>
-		public static int NextHashCode
-		{
-			get
-			{
-				return Interlocked.Increment(ref baseHashcode);
-			}
-		}
+        /// <summary>
+        /// The next hash code value for a mock object.
+        /// This is safe for multi threading.
+        /// </summary>
+        public static int NextHashCode
+        {
+            get
+            {
+                return Interlocked.Increment(ref baseHashcode);
+            }
+        }
 
-		/// <summary>
+        /// <summary>
         /// The sole instance of <see cref="MockedObjectsEquality "/>
-		/// </summary>
-		public static MockedObjectsEquality Instance
-		{
-			get { return instance; }
-		}
+        /// </summary>
+        public static MockedObjectsEquality Instance
+        {
+            get { return instance; }
+        }
 
-		/// <summary>
-		/// Get the hash code for a proxy object without calling GetHashCode()
-		/// on the object.
-		/// </summary>
-		public int GetHashCode(object obj)
-		{
-			IMockedObject mockedObject = MockRepository.GetMockedObjectOrNull(obj);
-			if (mockedObject==null)
-				return obj.GetHashCode();
-			return mockedObject.ProxyHash;
-		}
+        /// <summary>
+        /// Get the hash code for a proxy object without calling GetHashCode()
+        /// on the object.
+        /// </summary>
+        public int GetHashCode(object obj)
+        {
+            IMockedObject mockedObject = MockRepository.GetMockedObjectOrNull(obj);
+            if (mockedObject == null)
+                return obj.GetHashCode();
+            return mockedObject.ProxyHash;
+        }
 
         /// <summary>
         /// Compares two instances of mocked objects
@@ -91,10 +91,10 @@ namespace Rhino.Mocks.Impl
             if (y == null)
                 return -1;
 
-			IMockedObject one = MockRepository.GetMockedObjectOrNull(x);
-			IMockedObject two = MockRepository.GetMockedObjectOrNull(y);
+            IMockedObject one = MockRepository.GetMockedObjectOrNull(x);
+            IMockedObject two = MockRepository.GetMockedObjectOrNull(y);
             if (one == null && two == null)
-            	return -2;//both of them are probably transperant proxies
+                return -2;//both of them are probably transperant proxies
             if (one == null)
                 return 1;
             if (two == null)
@@ -103,9 +103,9 @@ namespace Rhino.Mocks.Impl
             return one.ProxyHash - two.ProxyHash;
         }
 
-		private MockedObjectsEquality()
-		{
-		}
+        private MockedObjectsEquality()
+        {
+        }
 
         #region IEqualityComparer Members
 
@@ -114,7 +114,7 @@ namespace Rhino.Mocks.Impl
         /// </summary>
         public new bool Equals(object x, object y)
         {
-            return Compare(x, y)==0;
+            return Compare(x, y) == 0;
         }
 
         #endregion

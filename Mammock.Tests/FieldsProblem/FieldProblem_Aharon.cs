@@ -60,9 +60,10 @@ namespace Rhino.Mocks.Tests.FieldsProblem
 			MockRepository mocks = new MockRepository();
 			Accepter accepter = mocks.StrictMock<Accepter>();
 			mocks.ReplayAll();
-			Assert.Throws<ExpectationViolationException>(
-				"Accepter.Accept(Rhino.Mocks.Tests.FieldsProblem.Accepter); Expected #0, Actual #1.",
+			string expectedMessage="Accepter.Accept(Rhino.Mocks.Tests.FieldsProblem.Accepter); Expected #0, Actual #1.";
+ExpectationViolationException ex = Assert.Throws<ExpectationViolationException>(
 				() => accepter.Accept(accepter));
+Assert.Equal(expectedMessage, ex.Message);
 
 		}
 	}
