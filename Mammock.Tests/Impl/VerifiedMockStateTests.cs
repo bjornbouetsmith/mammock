@@ -29,10 +29,10 @@
 
 using System;
 using Xunit;
-using Rhino.Mocks.Impl;
-using Rhino.Mocks.Interfaces;
+using Mammock.Impl;
+using Mammock.Interfaces;
 
-namespace Rhino.Mocks.Tests.Impl
+namespace Mammock.Tests.Impl
 {
 	
 	public class VerifiedMockStateTests

@@ -1,17 +1,26 @@
 using Castle.DynamicProxy;
-using Rhino.Mocks.Interfaces;
+using Mammock.Interfaces;
 
-namespace Rhino.Mocks.Impl.Invocation.Actions
+namespace Mammock.Impl.Invocation.Actions
 {
-    ///<summary>
-    ///</summary>
+    /// <summary>
+    /// The proceed.
+    /// </summary>
     public class Proceed : IInvocationActionn
     {
-        ///<summary>
-        ///</summary>
+        #region IInvocationActionn Members
+
+        /// <summary>
+        /// The perform against.
+        /// </summary>
+        /// <param name="invocation">
+        /// The invocation.
+        /// </param>
         public void PerformAgainst(IInvocation invocation)
         {
             invocation.Proceed();
         }
+
+        #endregion
     }
 }

@@ -29,7 +29,7 @@
 
 using System;
 
-namespace Rhino.Mocks.Tests
+namespace Mammock.Tests
 {
 	using Xunit;
 

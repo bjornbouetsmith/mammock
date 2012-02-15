@@ -30,12 +30,12 @@
 /*
 using NUnit.Framework;
 using Xunit;
-using Rhino.Mocks.Exceptions;
+using Mammock.Exceptions;
 using Xunit.Extensions;
 using Assert = Xunit.Assert;
 using Theory = Xunit.Extensions.TheoryAttribute;
 
-namespace Rhino.Mocks.Tests.FieldsProblem
+namespace Mammock.Tests.FieldsProblem
 {
 	
 	public class FieldProblem_Jodran

@@ -31,15 +31,15 @@ using System;
 using System.Reflection;
 using Castle.DynamicProxy;
 using Xunit;
-using Rhino.Mocks.Exceptions;
-using Rhino.Mocks.Expectations;
-using Rhino.Mocks.Impl;
-using Rhino.Mocks.Interfaces;
-using Rhino.Mocks.MethodRecorders;
-using Rhino.Mocks.Generated;
-using Rhino.Mocks.Tests.Expectations;
+using Mammock.Exceptions;
+using Mammock.Expectations;
+using Mammock.Impl;
+using Mammock.Interfaces;
+using Mammock.MethodRecorders;
+using Mammock.Generated;
+using Mammock.Tests.Expectations;
 
-namespace Rhino.Mocks.Tests.MethodRecorders
+namespace Mammock.Tests.MethodRecorders
 {
 	
 	public class MethodRecorderBaseTests

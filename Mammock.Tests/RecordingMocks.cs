@@ -30,10 +30,10 @@
 using System;
 using System.Collections.Generic;
 using Xunit;
-using Rhino.Mocks.Constraints;
-using Rhino.Mocks.Exceptions;
+using Mammock.Constraints;
+using Mammock.Exceptions;
 
-namespace Rhino.Mocks.Tests
+namespace Mammock.Tests
 {
 
     public class RecordingMocks

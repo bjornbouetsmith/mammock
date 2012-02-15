@@ -25,11 +25,11 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
-namespace Rhino.Mocks.Tests.FieldsProblem
+namespace Mammock.Tests.FieldsProblem
 {
 	using System;
 	using Xunit;
-	using Rhino.Mocks.Constraints;
+	using Mammock.Constraints;
 
 	public class ClassWithFinalizer
 	{

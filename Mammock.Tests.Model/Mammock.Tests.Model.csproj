@@ -8,8 +8,8 @@
     <ProjectGuid>{3078B943-10A5-41FA-A68A-7C4FC98506A0}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>EmptyClassProject</RootNamespace>
-    <AssemblyName>EmptyClassProject</AssemblyName>
+    <RootNamespace>Mammock.Tests.Model</RootNamespace>
+    <AssemblyName>Mammock.Tests.Model</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

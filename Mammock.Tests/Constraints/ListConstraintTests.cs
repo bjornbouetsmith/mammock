@@ -28,11 +28,11 @@
 
 using System;
 using Xunit;
-using Rhino.Mocks.Constraints;
+using Mammock.Constraints;
 using System.Collections.Generic;
 using System.Collections;
 
-namespace Rhino.Mocks.Tests.Constraints
+namespace Mammock.Tests.Constraints
 {
 	
 	public class ListConstraintTests

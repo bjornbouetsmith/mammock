@@ -1,23 +1,36 @@
-namespace Rhino.Mocks.Impl.RemotingMock
-{
-    using System;
-    using Rhino.Mocks.Interfaces;
-    using Castle.DynamicProxy;
+using System;
+using Castle.DynamicProxy;
+using Mammock.Interfaces;
 
+namespace Mammock.Impl.RemotingMock
+{
     /// <summary>
     /// Generates remoting proxies and provides utility functions
     /// </summary>
     internal class RemotingMockGenerator
     {
-        ///<summary>
+        /// <summary>
         /// Create the proxy using remoting
-        ///</summary>
+        /// </summary>
+        /// <param name="type">
+        /// The type.
+        /// </param>
+        /// <param name="interceptor">
+        /// The interceptor.
+        /// </param>
+        /// <param name="mockedObject">
+        /// The mocked Object.
+        /// </param>
+        /// <returns>
+        /// The create remoting mock.
+        /// </returns>
         public object CreateRemotingMock(Type type, IInterceptor interceptor, IMockedObject mockedObject)
         {
-            if (type.IsInterface == false && !typeof(MarshalByRefObject).IsAssignableFrom(type))
+            if (type.IsInterface == false && !typeof (MarshalByRefObject).IsAssignableFrom(type))
             {
                 throw new InvalidCastException(
-                    String.Format("Cannot create remoting proxy. '{0}' is not derived from MarshalByRefObject", type.Name));
+                    string.Format("Cannot create remoting proxy. '{0}' is not derived from MarshalByRefObject", 
+                                  type.Name));
             }
 
             return new RemotingProxy(type, interceptor, mockedObject).GetTransparentProxy();
@@ -26,10 +39,16 @@ namespace Rhino.Mocks.Impl.RemotingMock
         /// <summary>
         /// Check whether an object is a transparent proxy with a RemotingProxy behind it
         /// </summary>
-        /// <param name="obj">Object to check</param>
-        /// <returns>true if the object is a transparent proxy with a RemotingProxy instance behind it, false otherwise</returns>
-        /// <remarks>We use Equals() method to communicate with the real proxy behind the object.
-        /// See IRemotingProxyOperation for more details</remarks>
+        /// <param name="obj">
+        /// Object to check
+        /// </param>
+        /// <returns>
+        /// true if the object is a transparent proxy with a RemotingProxy instance behind it, false otherwise
+        /// </returns>
+        /// <remarks>
+        /// We use Equals() method to communicate with the real proxy behind the object.
+        /// See IRemotingProxyOperation for more details
+        /// </remarks>
         public static bool IsRemotingProxy(object obj)
         {
             if (obj == null) return false;
@@ -41,10 +60,16 @@ namespace Rhino.Mocks.Impl.RemotingMock
         /// <summary>
         /// Retrieve a mocked object from a transparent proxy
         /// </summary>
-        /// <param name="proxy">Transparent proxy with a RemotingProxy instance behind it</param>
-        /// <returns>Mocked object associated with the proxy</returns>
-        /// <remarks>We use Equals() method to communicate with the real proxy behind the object.
-        /// See IRemotingProxyOperation for more details</remarks>
+        /// <param name="proxy">
+        /// Transparent proxy with a RemotingProxy instance behind it
+        /// </param>
+        /// <returns>
+        /// Mocked object associated with the proxy
+        /// </returns>
+        /// <remarks>
+        /// We use Equals() method to communicate with the real proxy behind the object.
+        /// See IRemotingProxyOperation for more details
+        /// </remarks>
         public static IMockedObject GetMockedObjectFromProxy(object proxy)
         {
             if (proxy == null) return null;

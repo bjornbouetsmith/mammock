@@ -4,10 +4,10 @@ using System.Text;
 using System.Collections.Generic;
 using Xunit;
 
-using Rhino.Mocks.Constraints;
+using Mammock.Constraints;
 
 #region TestObjects
-namespace Rhino.Mocks.Tests.AllPropertiesMatchConstraint
+namespace Mammock.Tests.AllPropertiesMatchConstraint
 {
     public class Catalog
     {
@@ -102,11 +102,11 @@ namespace Rhino.Mocks.Tests.AllPropertiesMatchConstraint
 
 #endregion
 
-namespace Rhino.Mocks.Tests.Constraints
+namespace Mammock.Tests.Constraints
 {
 	using System.Globalization;
 	using System.Threading;
-	using Rhino.Mocks.Tests.AllPropertiesMatchConstraint;
+	using Mammock.Tests.AllPropertiesMatchConstraint;
 
     
     public class AllPropertiesMatchConstraintTest : IDisposable

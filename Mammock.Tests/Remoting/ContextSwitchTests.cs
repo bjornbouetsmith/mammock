@@ -32,10 +32,10 @@ using System.IO;
 using System.Reflection;
 using System.Security.Permissions;
 using Xunit;
-using Rhino.Mocks.Exceptions;
+using Mammock.Exceptions;
 
 
-namespace Rhino.Mocks.Tests.Remoting
+namespace Mammock.Tests.Remoting
 {
 
 	/// <summary>

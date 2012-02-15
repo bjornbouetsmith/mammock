@@ -31,9 +31,9 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using Xunit;
-using Rhino.Mocks.Interfaces;
+using Mammock.Interfaces;
 
-namespace Rhino.Mocks.Tests
+namespace Mammock.Tests
 {
 	
 	public class MockingClassesTests

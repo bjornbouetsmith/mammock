@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Xunit;
 
-namespace Rhino.Mocks.Tests.FieldsProblem
+namespace Mammock.Tests.FieldsProblem
 {
     using Exceptions;
 

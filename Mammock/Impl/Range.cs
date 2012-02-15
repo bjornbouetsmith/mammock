@@ -1,10 +1,9 @@
 ﻿#region license
+
 // Copyright (c) 2005 - 2007 Ayende Rahien (ayende@ayende.com)
 // All rights reserved.
-// 
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
-// 
 //     * Redistributions of source code must retain the above copyright notice,
 //     this list of conditions and the following disclaimer.
 //     * Redistributions in binary form must reproduce the above copyright notice,
@@ -13,7 +12,6 @@
 //     * Neither the name of Ayende Rahien nor the names of its
 //     contributors may be used to endorse or promote products derived from this
 //     software without specific prior written permission.
-// 
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 // ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 // WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -26,58 +24,70 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
 
-
-namespace Rhino.Mocks.Impl
+namespace Mammock.Impl
 {
-	/// <summary>
-	/// Range for expected method calls
-	/// </summary>
-	public class Range
-	{
-		private int min;
-	    private int? max;
+    /// <summary>
+    /// Range for expected method calls
+    /// </summary>
+    public class Range
+    {
+        /// <summary>
+        /// The min.
+        /// </summary>
+        private readonly int min;
 
-	    /// <summary>
-		/// Creates a new <see cref="Range"/> instance.
-		/// </summary>
-		/// <param name="min">Min.</param>
-		/// <param name="max">Max.</param>
-		public Range(int min, int? max)
-		{
-			this.min = min;
-			this.max = max;
-		}
+        /// <summary>
+        /// The max.
+        /// </summary>
+        private int? max;
 
-		/// <summary>
-		/// Gets or sets the min.
-		/// </summary>
-		/// <value></value>
-		public int Min
-		{
-			get { return min; }
-		}
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Range"/> class. 
+        /// Creates a new <see cref="Range"/> instance.
+        /// </summary>
+        /// <param name="min">
+        /// Min.
+        /// </param>
+        /// <param name="max">
+        /// Max.
+        /// </param>
+        public Range(int min, int? max)
+        {
+            this.min = min;
+            this.max = max;
+        }
 
-		/// <summary>
-		/// Gets or sets the max.
-		/// </summary>
-		/// <value></value>
-		public int? Max
-		{
-			get { return max; }
-		}
+        /// <summary>
+        /// Gets or sets the min.
+        /// </summary>
+        /// <value></value>
+        public int Min
+        {
+            get { return min; }
+        }
 
-		/// <summary>
-		/// Return the string representation of this range.
-		/// </summary>
-		public override string ToString()
-		{
-			if (min == 0)
-				return max.ToString();
-			if (max != null && min != max.Value)
-				return min + ".." + max;
-		    return min.ToString();
-		}
+        /// <summary>
+        /// Gets or sets the max.
+        /// </summary>
+        /// <value></value>
+        public int? Max
+        {
+            get { return max; }
+        }
 
-
-	}
+        /// <summary>
+        /// Return the string representation of this range.
+        /// </summary>
+        /// <returns>
+        /// The to string.
+        /// </returns>
+        public override string ToString()
+        {
+            if (min == 0)
+                return max.ToString();
+            if (max != null && min != max.Value)
+                return min + ".." + max;
+            return min.ToString();
+        }
+    }
 }

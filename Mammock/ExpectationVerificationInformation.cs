@@ -1,15 +1,21 @@
 using System.Collections.Generic;
-using Rhino.Mocks.Generated;
-using Rhino.Mocks.Interfaces;
+using Mammock.Interfaces;
 
-namespace Rhino.Mocks
+namespace Mammock
 {
-	internal class ExpectationVerificationInformation
-	{
-	    private IExpectation expected;
-		private IList<object[]> argumentsForAllCalls;
-		
-		public IExpectation Expected { get { return expected; } set { expected = value; } }
-		public IList<object[]> ArgumentsForAllCalls { get { return argumentsForAllCalls; } set { argumentsForAllCalls = value; }  }
-	}
+    /// <summary>
+    /// The expectation verification information.
+    /// </summary>
+    internal class ExpectationVerificationInformation
+    {
+        /// <summary>
+        /// Gets or sets Expected.
+        /// </summary>
+        public IExpectation Expected { get; set; }
+
+        /// <summary>
+        /// Gets or sets ArgumentsForAllCalls.
+        /// </summary>
+        public IList<object[]> ArgumentsForAllCalls { get; set; }
+    }
 }

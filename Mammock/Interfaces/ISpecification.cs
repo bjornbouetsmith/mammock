@@ -1,11 +1,21 @@
-namespace Rhino.Mocks.Impl.InvocationSpecifications
+namespace Mammock.Impl.InvocationSpecifications
 {
-    ///<summary>
-    ///</summary>
+    /// <summary>
+    /// The i specification.
+    /// </summary>
+    /// <typeparam name="T">
+    /// </typeparam>
     public interface ISpecification<T>
     {
-        ///<summary>
-        ///</summary>
+        /// <summary>
+        /// The is satisfied by.
+        /// </summary>
+        /// <param name="item">
+        /// The item.
+        /// </param>
+        /// <returns>
+        /// The is satisfied by.
+        /// </returns>
         bool IsSatisfiedBy(T item);
     }
 }

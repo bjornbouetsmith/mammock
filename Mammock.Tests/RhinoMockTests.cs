@@ -31,10 +31,10 @@ using System;
 using System.Collections;
 using System.ServiceModel;
 using Xunit;
-using Rhino.Mocks.Exceptions;
-using Rhino.Mocks.Tests.Callbacks;
+using Mammock.Exceptions;
+using Mammock.Tests.Callbacks;
 
-namespace Rhino.Mocks.Tests
+namespace Mammock.Tests
 {
 
     public class RhinoMockTests

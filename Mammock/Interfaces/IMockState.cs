@@ -1,10 +1,9 @@
 ﻿#region license
+
 // Copyright (c) 2005 - 2007 Ayende Rahien (ayende@ayende.com)
 // All rights reserved.
-// 
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
-// 
 //     * Redistributions of source code must retain the above copyright notice,
 //     this list of conditions and the following disclaimer.
 //     * Redistributions in binary form must reproduce the above copyright notice,
@@ -13,7 +12,6 @@
 //     * Neither the name of Ayende Rahien nor the names of its
 //     contributors may be used to endorse or promote products derived from this
 //     software without specific prior written permission.
-// 
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 // ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 // WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -26,69 +24,82 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
 
-
 using System;
 using System.Reflection;
 using Castle.DynamicProxy;
 
-namespace Rhino.Mocks.Interfaces
+namespace Mammock.Interfaces
 {
-	/// <summary>
-	/// Different actions on this mock
-	/// </summary>
-	public interface IMockState
-	{
-		/// <summary>
-		/// Add a method call for this state' mock.
-		/// </summary>
-        /// <param name="invocation">The invocation for this method</param>
-		/// <param name="method">The method that was called</param>
-		/// <param name="args">The arguments this method was called with</param>
+    /// <summary>
+    /// Different actions on this mock
+    /// </summary>
+    public interface IMockState
+    {
+        /// <summary>
+        /// Gets the matching verify state for this state
+        /// </summary>
+        IMockState VerifyState { get; }
+
+        /// <summary>
+        /// Get the options for the last method call
+        /// </summary>
+        IMethodOptions<object> LastMethodOptions { get; }
+
+        /// <summary>
+        /// Add a method call for this state' mock.
+        /// </summary>
+        /// <param name="invocation">
+        /// The invocation for this method
+        /// </param>
+        /// <param name="method">
+        /// The method that was called
+        /// </param>
+        /// <param name="args">
+        /// The arguments this method was called with
+        /// </param>
+        /// <returns>
+        /// The method call.
+        /// </returns>
         object MethodCall(IInvocation invocation, MethodInfo method, params object[] args);
 
-		/// <summary>
-		/// Verify that this mock expectations have passed.
-		/// </summary>
-		void Verify();
+        /// <summary>
+        /// Verify that this mock expectations have passed.
+        /// </summary>
+        void Verify();
 
-		/// <summary>
-		/// Gets the matching verify state for this state
-		/// </summary>
-		IMockState VerifyState { get; }
-
-		/// <summary>
-		/// Verify that we can move to replay state and move 
-		/// to the reply state.
-		/// </summary>
-		IMockState Replay();
+        /// <summary>
+        /// Verify that we can move to replay state and move 
+        /// to the reply state.
+        /// </summary>
+        IMockState Replay();
 
         /// <summary>
         /// Gets a mock state that match the original mock state of the object.
         /// </summary>
         IMockState BackToRecord();
 
-		/// <summary>
-		/// Get the options for the last method call
-		/// </summary>
-		IMethodOptions<T> GetLastMethodOptions<T>();
+        /// <summary>
+        /// Get the options for the last method call
+        /// </summary>
+        /// <typeparam name="T">
+        /// </typeparam>
+        IMethodOptions<T> GetLastMethodOptions<T>();
 
-		/// <summary>
-		/// Get the options for the last method call
-		/// </summary>
-		IMethodOptions<object> LastMethodOptions { get; }
-
-		/// <summary>
-		/// Set the exception to throw when Verify is called.
-		/// This is used to report exception that may have happened but where caught in the code.
-		/// This way, they are reported anyway when Verify() is called.
-		/// </summary>
-		void SetExceptionToThrowOnVerify(Exception ex);
+        /// <summary>
+        /// Set the exception to throw when Verify is called.
+        /// This is used to report exception that may have happened but where caught in the code.
+        /// This way, they are reported anyway when Verify() is called.
+        /// </summary>
+        /// <param name="ex">
+        /// The ex.
+        /// </param>
+        void SetExceptionToThrowOnVerify(Exception ex);
 
         /// <summary>
         /// This method is called to indicate that a property behavior call.
         /// This is done so we generate good error message in the common case of people using
         /// Stubbed properties with Return().
         /// </summary>
-	    void NotifyCallOnPropertyBehavior();
-	}
+        void NotifyCallOnPropertyBehavior();
+    }
 }

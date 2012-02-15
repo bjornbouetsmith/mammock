@@ -1,9 +1,8 @@
 
 using System;
 using Xunit;
-using Rhino.Mocks;
 
-namespace Rhino.Mocks.Tests.FieldsProblem
+namespace Mammock.Tests.FieldsProblem
 {
     
     public class FieldProblem_TrueWill

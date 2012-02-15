@@ -1,4 +1,4 @@
-namespace Rhino.Mocks.GettingStarted
+namespace Mammock.GettingStarted
 {
     public static class Helpers
     {

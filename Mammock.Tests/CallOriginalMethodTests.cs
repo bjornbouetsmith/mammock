@@ -29,9 +29,9 @@
 
 using System;
 using Castle.DynamicProxy;
-using Rhino.Mocks.Interfaces;
+using Mammock.Interfaces;
 
-namespace Rhino.Mocks.Tests
+namespace Mammock.Tests
 {
     using Xunit;
 

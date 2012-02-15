@@ -27,9 +27,9 @@
 
 using System;
 using Xunit;
-using Rhino.Mocks.Exceptions;
+using Mammock.Exceptions;
 
-namespace Rhino.Mocks.Tests
+namespace Mammock.Tests
 {
 
     public class StrictMockTests

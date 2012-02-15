@@ -1,10 +1,9 @@
 ﻿#region license
+
 // Copyright (c) 2005 - 2007 Ayende Rahien (ayende@ayende.com)
 // All rights reserved.
-// 
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
-// 
 //     * Redistributions of source code must retain the above copyright notice,
 //     this list of conditions and the following disclaimer.
 //     * Redistributions in binary form must reproduce the above copyright notice,
@@ -13,7 +12,6 @@
 //     * Neither the name of Ayende Rahien nor the names of its
 //     contributors may be used to endorse or promote products derived from this
 //     software without specific prior written permission.
-// 
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 // ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 // WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -26,14 +24,12 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
 
-
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 
-namespace Rhino.Mocks.Interfaces
+namespace Mammock.Interfaces
 {
-    using System.Reflection;
-
     /// <summary>
     /// Interface to find the repository of a mocked object
     /// </summary>
@@ -56,55 +52,6 @@ namespace Rhino.Mocks.Interfaces
         MockRepository Repository { get; }
 
         /// <summary>
-        /// Return true if it should call the original method on the object
-        /// instead of pass it to the message chain.
-        /// </summary>
-        /// <param name="method">The method to call</param>
-        bool ShouldCallOriginal(MethodInfo method);
-
-        /// <summary>
-        /// Register a method to be called on the object directly
-        /// </summary>
-        void RegisterMethodForCallingOriginal(MethodInfo method);
-
-        /// <summary>
-        /// Register a property on the object that will behave as a simple property
-        /// </summary>
-        bool RegisterPropertyBehaviorFor(PropertyInfo prop);
-
-        /// <summary>
-        /// Check if the method was registered as a property method.
-        /// </summary>
-        bool IsPropertyMethod(MethodInfo method);
-
-        /// <summary>
-        /// Do get/set on the property, according to need.
-        /// </summary>
-        object HandleProperty(MethodInfo method, object[] args);
-
-        /// <summary>
-        /// Do add/remove on the event
-        /// </summary>
-        void HandleEvent(MethodInfo method, object[] args);
-
-        /// <summary>
-        /// Get the subscribers of a spesific event
-        /// </summary>
-        Delegate GetEventSubscribers(string eventName);
-
-
-        /// <summary>
-        /// Gets the declaring type of the method, taking into acccount the possible generic 
-        /// parameters that it was created with.
-        /// </summary>
-        Type GetDeclaringType(MethodInfo info);
-
-        /// <summary>
-        /// Clears the state of the object, remove original calls, property behavior, subscribed events, etc.
-        /// </summary>
-        void ClearState(BackToRecordOptions options);
-
-        /// <summary>
         /// Gets the implemented types by this mocked object
         /// </summary>
         /// <value>The implemented.</value>
@@ -122,9 +69,105 @@ namespace Rhino.Mocks.Interfaces
         object MockedObjectInstance { get; set; }
 
         /// <summary>
+        /// Return true if it should call the original method on the object
+        /// instead of pass it to the message chain.
+        /// </summary>
+        /// <param name="method">
+        /// The method to call
+        /// </param>
+        /// <returns>
+        /// The should call original.
+        /// </returns>
+        bool ShouldCallOriginal(MethodInfo method);
+
+        /// <summary>
+        /// Register a method to be called on the object directly
+        /// </summary>
+        /// <param name="method">
+        /// The method.
+        /// </param>
+        void RegisterMethodForCallingOriginal(MethodInfo method);
+
+        /// <summary>
+        /// Register a property on the object that will behave as a simple property
+        /// </summary>
+        /// <param name="prop">
+        /// The prop.
+        /// </param>
+        /// <returns>
+        /// The register property behavior for.
+        /// </returns>
+        bool RegisterPropertyBehaviorFor(PropertyInfo prop);
+
+        /// <summary>
+        /// Check if the method was registered as a property method.
+        /// </summary>
+        /// <param name="method">
+        /// The method.
+        /// </param>
+        /// <returns>
+        /// The is property method.
+        /// </returns>
+        bool IsPropertyMethod(MethodInfo method);
+
+        /// <summary>
+        /// Do get/set on the property, according to need.
+        /// </summary>
+        /// <param name="method">
+        /// The method.
+        /// </param>
+        /// <param name="args">
+        /// The args.
+        /// </param>
+        /// <returns>
+        /// The handle property.
+        /// </returns>
+        object HandleProperty(MethodInfo method, object[] args);
+
+        /// <summary>
+        /// Do add/remove on the event
+        /// </summary>
+        /// <param name="method">
+        /// The method.
+        /// </param>
+        /// <param name="args">
+        /// The args.
+        /// </param>
+        void HandleEvent(MethodInfo method, object[] args);
+
+        /// <summary>
+        /// Get the subscribers of a spesific event
+        /// </summary>
+        /// <param name="eventName">
+        /// The event Name.
+        /// </param>
+        Delegate GetEventSubscribers(string eventName);
+
+
+        /// <summary>
+        /// Gets the declaring type of the method, taking into acccount the possible generic 
+        /// parameters that it was created with.
+        /// </summary>
+        /// <param name="info">
+        /// The info.
+        /// </param>
+        Type GetDeclaringType(MethodInfo info);
+
+        /// <summary>
+        /// Clears the state of the object, remove original calls, property behavior, subscribed events, etc.
+        /// </summary>
+        /// <param name="options">
+        /// The options.
+        /// </param>
+        void ClearState(BackToRecordOptions options);
+
+        /// <summary>
         /// Get all the method calls arguments that were made against this object with the specificed 
         /// method.
         /// </summary>
+        /// <param name="method">
+        /// The method.
+        /// </param>
         /// <remarks>
         /// Only method calls in replay mode are counted
         /// </remarks>
@@ -133,6 +176,12 @@ namespace Rhino.Mocks.Interfaces
         /// <summary>
         /// Records the method call
         /// </summary>
+        /// <param name="method">
+        /// The method.
+        /// </param>
+        /// <param name="args">
+        /// The args.
+        /// </param>
         void MethodCall(MethodInfo method, object[] args);
     }
 }

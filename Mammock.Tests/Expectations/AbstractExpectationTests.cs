@@ -29,11 +29,11 @@
 
 using System.Reflection;
 using Xunit;
-using Rhino.Mocks.Expectations;
-using Rhino.Mocks.Impl;
-using Rhino.Mocks.Interfaces;
+using Mammock.Expectations;
+using Mammock.Impl;
+using Mammock.Interfaces;
 
-namespace Rhino.Mocks.Tests.Expectations
+namespace Mammock.Tests.Expectations
 {
 
 	public abstract class AbstractExpectationTests

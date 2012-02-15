@@ -1,7 +1,7 @@
 using Xunit;
-using Rhino.Mocks.Constraints;
+using Mammock.Constraints;
 
-namespace Rhino.Mocks.Tests.FieldsProblem
+namespace Mammock.Tests.FieldsProblem
 {
     
     public class FieldProblem_Raju

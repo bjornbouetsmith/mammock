@@ -2,10 +2,8 @@
 
 // Copyright (c) 2005 - 2007 Ayende Rahien (ayende@ayende.com)
 // All rights reserved.
-// 
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
-// 
 //     * Redistributions of source code must retain the above copyright notice,
 //     this list of conditions and the following disclaimer.
 //     * Redistributions in binary form must reproduce the above copyright notice,
@@ -14,7 +12,6 @@
 //     * Neither the name of Ayende Rahien nor the names of its
 //     contributors may be used to endorse or promote products derived from this
 //     software without specific prior written permission.
-// 
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 // ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 // WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -25,7 +22,6 @@
 // CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
 #endregion
 
 using System;
@@ -33,9 +29,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
-using Rhino.Mocks.Interfaces;
+using Mammock.Interfaces;
 
-namespace Rhino.Mocks.Impl
+namespace Mammock.Impl
 {
     /// <summary>
     /// This is a dummy type that is used merely to give DynamicProxy the proxy instance that
@@ -43,27 +39,75 @@ namespace Rhino.Mocks.Impl
     /// </summary>
     public class ProxyInstance : MarshalByRefObject, IMockedObject
     {
-        private readonly MockRepository repository;
-        private readonly int hashCode;
-        private IList originalMethodsToCall;
-        private IList propertiesToSimulate;
-        private IDictionary propertiesValues;
-        private IDictionary eventsSubscribers;
-        private readonly Type[] implemented;
-
-        private readonly IDictionary<MethodInfo, ICollection<object[]>> methodToActualCalls = new Dictionary<MethodInfo, ICollection<object[]>>();
-        private object[] constructorArguments = new object[0];
-        private IList<IMockedObject> dependentMocks = new List<IMockedObject>();
+        /// <summary>
+        /// The dependent mocks.
+        /// </summary>
+        private readonly IList<IMockedObject> dependentMocks = new List<IMockedObject>();
 
         /// <summary>
+        /// The hash code.
+        /// </summary>
+        private readonly int hashCode;
+
+        /// <summary>
+        /// The implemented.
+        /// </summary>
+        private readonly Type[] implemented;
+
+        /// <summary>
+        /// The method to actual calls.
+        /// </summary>
+        private readonly IDictionary<MethodInfo, ICollection<object[]>> methodToActualCalls =
+            new Dictionary<MethodInfo, ICollection<object[]>>();
+
+        /// <summary>
+        /// The repository.
+        /// </summary>
+        private readonly MockRepository repository;
+
+        /// <summary>
+        /// The constructor arguments.
+        /// </summary>
+        private object[] constructorArguments = new object[0];
+
+        /// <summary>
+        /// The events subscribers.
+        /// </summary>
+        private IDictionary eventsSubscribers;
+
+        /// <summary>
+        /// The original methods to call.
+        /// </summary>
+        private IList originalMethodsToCall;
+
+        /// <summary>
+        /// The properties to simulate.
+        /// </summary>
+        private IList propertiesToSimulate;
+
+        /// <summary>
+        /// The properties values.
+        /// </summary>
+        private IDictionary propertiesValues;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ProxyInstance"/> class. 
         /// Create a new instance of <see cref="ProxyInstance"/>
         /// </summary>
+        /// <param name="repository">
+        /// The repository.
+        /// </param>
+        /// <param name="implemented">
+        /// The implemented.
+        /// </param>
         public ProxyInstance(MockRepository repository, params Type[] implemented)
         {
             this.repository = repository;
             this.implemented = implemented;
             hashCode = MockedObjectsEquality.NextHashCode;
         }
+
+        #region IMockedObject Members
 
         /// <summary>
         /// Mocks that are tied to this mock lifestyle
@@ -94,7 +138,12 @@ namespace Rhino.Mocks.Impl
         /// Return true if it should call the original method on the object
         /// instead of pass it to the message chain.
         /// </summary>
-        /// <param name="method">The method to call</param>
+        /// <param name="method">
+        /// The method to call
+        /// </param>
+        /// <returns>
+        /// The should call original.
+        /// </returns>
         public virtual bool ShouldCallOriginal(MethodInfo method)
         {
             if (originalMethodsToCall == null)
@@ -105,6 +154,9 @@ namespace Rhino.Mocks.Impl
         /// <summary>
         /// Register a method to be called on the object directly
         /// </summary>
+        /// <param name="method">
+        /// The method.
+        /// </param>
         public virtual void RegisterMethodForCallingOriginal(MethodInfo method)
         {
             if (originalMethodsToCall == null)
@@ -116,6 +168,12 @@ namespace Rhino.Mocks.Impl
         /// Register a property on the object that will behave as a simple property
         /// Return true if there is already a value for the property
         /// </summary>
+        /// <param name="prop">
+        /// The prop.
+        /// </param>
+        /// <returns>
+        /// The register property behavior for.
+        /// </returns>
         public virtual bool RegisterPropertyBehaviorFor(PropertyInfo prop)
         {
             if (propertiesToSimulate == null)
@@ -127,52 +185,45 @@ namespace Rhino.Mocks.Impl
             if (propertiesToSimulate.Contains(setMethod) == false)
                 propertiesToSimulate.Add(setMethod);
             return propertiesValues != null &&
-                propertiesValues.Contains(GenerateKey(getMethod, new object[0]));
+                   propertiesValues.Contains(GenerateKey(getMethod, new object[0]));
         }
 
         /// <summary>
         /// Check if the method was registered as a property method.
         /// </summary>
+        /// <param name="method">
+        /// The method.
+        /// </param>
+        /// <returns>
+        /// The is property method.
+        /// </returns>
         public virtual bool IsPropertyMethod(MethodInfo method)
         {
             if (propertiesToSimulate == null)
                 return false;
-            //we have to do it this way, to handle generic types
+
+// we have to do it this way, to handle generic types
             foreach (MethodInfo info in propertiesToSimulate)
             {
                 if (AreMethodEquals(info, method))
                     return true;
             }
-            return false;
-        }
 
-        private static bool AreMethodEquals(MethodInfo left, MethodInfo right)
-        {
-            if (left.Equals(right))
-                return true;
-            // GetHashCode calls to RuntimeMethodHandle.StripMethodInstantiation()
-            // which is needed to fix issues with method equality from generic types.
-            if (left.GetHashCode() != right.GetHashCode())
-                return false;
-            if (left.DeclaringType != right.DeclaringType)
-                return false;
-            ParameterInfo[] leftParams = left.GetParameters();
-            ParameterInfo[] rightParams = right.GetParameters();
-            if (leftParams.Length != rightParams.Length)
-                return false;
-            for (int i = 0; i < leftParams.Length; i++)
-            {
-                if (leftParams[i].ParameterType != rightParams[i].ParameterType)
-                    return false;
-            }
-            if (left.ReturnType != right.ReturnType)
-                return false;
-            return true;
+            return false;
         }
 
         /// <summary>
         /// Do get/set on the property, according to need.
         /// </summary>
+        /// <param name="method">
+        /// The method.
+        /// </param>
+        /// <param name="args">
+        /// The args.
+        /// </param>
+        /// <returns>
+        /// The handle property.
+        /// </returns>
         public virtual object HandleProperty(MethodInfo method, object[] args)
         {
             if (propertiesValues == null)
@@ -185,9 +236,10 @@ namespace Rhino.Mocks.Impl
                 {
                     throw new InvalidOperationException(
                         string.Format(
-                            "Can't return a value for property {0} because no value was set and the Property return a value type.",
+                            "Can't return a value for property {0} because no value was set and the Property return a value type.", 
                             method.Name.Substring(4)));
                 }
+
                 return propertiesValues[key];
             }
 
@@ -200,12 +252,18 @@ namespace Rhino.Mocks.Impl
         /// <summary>
         /// Do add/remove on the event
         /// </summary>
+        /// <param name="method">
+        /// The method.
+        /// </param>
+        /// <param name="args">
+        /// The args.
+        /// </param>
         public virtual void HandleEvent(MethodInfo method, object[] args)
         {
             if (eventsSubscribers == null)
                 eventsSubscribers = new Hashtable();
 
-            Delegate subscriber = (Delegate)args[0];
+            Delegate subscriber = (Delegate) args[0];
             if (method.Name.StartsWith("add_"))
             {
                 AddEvent(method, subscriber);
@@ -219,17 +277,23 @@ namespace Rhino.Mocks.Impl
         /// <summary>
         /// Get the subscribers of a spesific event
         /// </summary>
+        /// <param name="eventName">
+        /// The event Name.
+        /// </param>
         public virtual Delegate GetEventSubscribers(string eventName)
         {
             if (eventsSubscribers == null)
                 return null;
-            return (Delegate)eventsSubscribers[eventName];
+            return (Delegate) eventsSubscribers[eventName];
         }
 
         /// <summary>
         /// Gets the declaring type of the method, taking into acccount the possible generic 
         /// parameters that it was created with.
         /// </summary>
+        /// <param name="info">
+        /// The info.
+        /// </param>
         public virtual Type GetDeclaringType(MethodInfo info)
         {
             Type typeDeclaringTheMethod = info.DeclaringType;
@@ -241,6 +305,7 @@ namespace Rhino.Mocks.Impl
                     typeDeclaringTheMethod == type.GetGenericTypeDefinition())
                     return type;
             }
+
             return null;
         }
 
@@ -255,16 +320,10 @@ namespace Rhino.Mocks.Impl
             set { constructorArguments = value; }
         }
 
-        private object mockedObjectInstance;
-
         /// <summary>
         /// The mocked instance that this is representing
         /// </summary>
-        public virtual object MockedObjectInstance
-        {
-            get { return mockedObjectInstance; }
-            set { mockedObjectInstance = value; }
-        }
+        public virtual object MockedObjectInstance { get; set; }
 
         /// <summary>
         /// Gets the implemented types by this mocked object
@@ -279,8 +338,10 @@ namespace Rhino.Mocks.Impl
         /// Get all the method calls arguments that were made against this object with the specificed
         /// method.
         /// </summary>
-        /// <param name="method"></param>
-        /// <returns></returns>
+        /// <param name="method">
+        /// </param>
+        /// <returns>
+        /// </returns>
         /// <remarks>
         /// Only method calls in replay mode are counted
         /// </remarks>
@@ -295,8 +356,10 @@ namespace Rhino.Mocks.Impl
         /// <summary>
         /// Records the method call
         /// </summary>
-        /// <param name="method"></param>
-        /// <param name="args"></param>
+        /// <param name="method">
+        /// </param>
+        /// <param name="args">
+        /// </param>
         public virtual void MethodCall(MethodInfo method, object[] args)
         {
             if (repository.IsInReplayMode(this) == false)
@@ -309,6 +372,9 @@ namespace Rhino.Mocks.Impl
         /// <summary>
         /// Clears the state of the object, remove original calls, property behavior, subscribed events, etc.
         /// </summary>
+        /// <param name="options">
+        /// The options.
+        /// </param>
         public virtual void ClearState(BackToRecordOptions options)
         {
             if (eventsSubscribers != null &&
@@ -325,9 +391,61 @@ namespace Rhino.Mocks.Impl
                 propertiesToSimulate.Clear();
         }
 
+        #endregion
+
+        /// <summary>
+        /// The are method equals.
+        /// </summary>
+        /// <param name="left">
+        /// The left.
+        /// </param>
+        /// <param name="right">
+        /// The right.
+        /// </param>
+        /// <returns>
+        /// The are method equals.
+        /// </returns>
+        private static bool AreMethodEquals(MethodInfo left, MethodInfo right)
+        {
+            if (left.Equals(right))
+                return true;
+
+// GetHashCode calls to RuntimeMethodHandle.StripMethodInstantiation()
+            // which is needed to fix issues with method equality from generic types.
+            if (left.GetHashCode() != right.GetHashCode())
+                return false;
+            if (left.DeclaringType != right.DeclaringType)
+                return false;
+            ParameterInfo[] leftParams = left.GetParameters();
+            ParameterInfo[] rightParams = right.GetParameters();
+            if (leftParams.Length != rightParams.Length)
+                return false;
+            for (int i = 0; i < leftParams.Length; i++)
+            {
+                if (leftParams[i].ParameterType != rightParams[i].ParameterType)
+                    return false;
+            }
+
+            if (left.ReturnType != right.ReturnType)
+                return false;
+            return true;
+        }
+
+        /// <summary>
+        /// The generate key.
+        /// </summary>
+        /// <param name="method">
+        /// The method.
+        /// </param>
+        /// <param name="args">
+        /// The args.
+        /// </param>
+        /// <returns>
+        /// The generate key.
+        /// </returns>
         private static string GenerateKey(MethodInfo method, object[] args)
         {
-            var baseName = method.DeclaringType.FullName + method.Name.Substring(4);
+            string baseName = method.DeclaringType.FullName + method.Name.Substring(4);
             if ((method.Name.StartsWith("get_") && args.Length == 0) ||
                 (method.Name.StartsWith("set_") && args.Length == 1))
                 return baseName;
@@ -340,22 +458,41 @@ namespace Rhino.Mocks.Impl
             {
                 sb.Append(args[i].GetHashCode());
             }
+
             return sb.ToString();
         }
 
+        /// <summary>
+        /// The remove event.
+        /// </summary>
+        /// <param name="method">
+        /// The method.
+        /// </param>
+        /// <param name="subscriber">
+        /// The subscriber.
+        /// </param>
         private void RemoveEvent(MethodInfo method, Delegate subscriber)
         {
             string eventName = method.Name.Substring(7);
-            Delegate existing = (MulticastDelegate)eventsSubscribers[eventName];
-            existing = MulticastDelegate.Remove(existing, subscriber);
+            Delegate existing = (MulticastDelegate) eventsSubscribers[eventName];
+            existing = Delegate.Remove(existing, subscriber);
             eventsSubscribers[eventName] = existing;
         }
 
+        /// <summary>
+        /// The add event.
+        /// </summary>
+        /// <param name="method">
+        /// The method.
+        /// </param>
+        /// <param name="subscriber">
+        /// The subscriber.
+        /// </param>
         private void AddEvent(MethodInfo method, Delegate subscriber)
         {
             string eventName = method.Name.Substring(4);
-            Delegate existing = (MulticastDelegate)eventsSubscribers[eventName];
-            existing = MulticastDelegate.Combine(existing, subscriber);
+            Delegate existing = (MulticastDelegate) eventsSubscribers[eventName];
+            existing = Delegate.Combine(existing, subscriber);
             eventsSubscribers[eventName] = existing;
         }
     }

@@ -1,10 +1,9 @@
 ﻿#region license
+
 // Copyright (c) 2005 - 2007 Ayende Rahien (ayende@ayende.com)
 // All rights reserved.
-// 
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
-// 
 //     * Redistributions of source code must retain the above copyright notice,
 //     this list of conditions and the following disclaimer.
 //     * Redistributions in binary form must reproduce the above copyright notice,
@@ -13,7 +12,6 @@
 //     * Neither the name of Ayende Rahien nor the names of its
 //     contributors may be used to endorse or promote products derived from this
 //     software without specific prior written permission.
-// 
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 // ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 // WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -26,12 +24,7 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
 
-
-using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Rhino.Mocks
+namespace Mammock
 {
     /// <summary>
     /// Allows easier access to MockRepository, works closely with Mocker.Current to
@@ -40,17 +33,23 @@ namespace Rhino.Mocks
     /// </summary>
     public static class With
     {
+        #region Delegates
+
         /// <summary>
         /// A method with no arguments and no return value that will be called under the mock context.
         /// </summary>
         public delegate void Proc();
-        
+
+        #endregion
+
         /// <summary>
         /// Initialize a code block where Mocker.Current is initialized.
         /// At the end of the code block, all the expectation will be verified.
         /// This overload will create a new MockRepository.
         /// </summary>
-        /// <param name="methodCallThatHasMocks">The code that will be executed under the mock context</param>
+        /// <param name="methodCallThatHasMocks">
+        /// The code that will be executed under the mock context
+        /// </param>
         public static void Mocks(Proc methodCallThatHasMocks)
         {
             MockRepository mocks = new MockRepository();
@@ -62,8 +61,12 @@ namespace Rhino.Mocks
         /// At the end of the code block, all the expectation will be verified.
         /// This overload will create a new MockRepository.
         /// </summary>
-        /// <param name="mocks">The mock repository to use, at the end of the code block, VerifyAll() will be called on the repository.</param>
-        /// <param name="methodCallThatHasMocks">The code that will be executed under the mock context</param>
+        /// <param name="mocks">
+        /// The mock repository to use, at the end of the code block, VerifyAll() will be called on the repository.
+        /// </param>
+        /// <param name="methodCallThatHasMocks">
+        /// The code that will be executed under the mock context
+        /// </param>
         public static void Mocks(MockRepository mocks, Proc methodCallThatHasMocks)
         {
             Mocker.Current = mocks;
@@ -81,60 +84,94 @@ namespace Rhino.Mocks
         /// <summary>
         /// Create a FluentMocker
         /// </summary>
-        /// <param name="mocks">The mock repository to use.</param>
+        /// <param name="mocks">
+        /// The mock repository to use.
+        /// </param>
         public static FluentMocker Mocks(MockRepository mocks)
         {
             return new FluentMocker(mocks);
         }
 
+        #region Nested type: FluentMocker
+
         /// <summary>
         /// FluentMocker implements some kind of fluent interface attempt
         /// for saying "With the Mocks [mocks], Expecting (in same order) [things] verify [that]."
         /// </summary>
-        public class FluentMocker: IMockVerifier
+        public class FluentMocker : IMockVerifier
         {
-            private MockRepository _mocks;
+            /// <summary>
+            /// The _mocks.
+            /// </summary>
+            private readonly MockRepository _mocks;
 
+            /// <summary>
+            /// Initializes a new instance of the <see cref="FluentMocker"/> class.
+            /// </summary>
+            /// <param name="mocks">
+            /// The mocks.
+            /// </param>
             internal FluentMocker(MockRepository mocks)
             {
                 _mocks = mocks;
             }
 
+            #region IMockVerifier Members
+
+            /// <summary>
+            /// Verifies previously defined expectations
+            /// </summary>
+            /// <param name="methodCallsToBeVerified">
+            /// The method Calls To Be Verified.
+            /// </param>
+            public void Verify(Proc methodCallsToBeVerified)
+            {
+                methodCallsToBeVerified();
+                _mocks.VerifyAll();
+            }
+
+            #endregion
+
             /// <summary>
             /// Defines unordered expectations
             /// </summary>
-            /// <param name="methodCallsDescribingExpectations">A delegate describing the expectations</param>
-            /// <returns>an IMockVerifier</returns>
+            /// <param name="methodCallsDescribingExpectations">
+            /// A delegate describing the expectations
+            /// </param>
+            /// <returns>
+            /// an IMockVerifier
+            /// </returns>
             public IMockVerifier Expecting(Proc methodCallsDescribingExpectations)
             {
                 methodCallsDescribingExpectations();
                 _mocks.ReplayAll();
                 return this;
             }
+
             /// <summary>
             /// Defines ordered expectations
             /// </summary>
-            /// <param name="methodCallsDescribingExpectations">A delegate describing the expectations</param>
-            /// <returns>an IMockVerifier</returns>
+            /// <param name="methodCallsDescribingExpectations">
+            /// A delegate describing the expectations
+            /// </param>
+            /// <returns>
+            /// an IMockVerifier
+            /// </returns>
             public IMockVerifier ExpectingInSameOrder(Proc methodCallsDescribingExpectations)
             {
                 using (_mocks.Ordered())
                 {
                     methodCallsDescribingExpectations();
                 }
+
                 _mocks.ReplayAll();
                 return this;
             }
-
-            /// <summary>
-            /// Verifies previously defined expectations
-            /// </summary>
-            public void Verify(Proc methodCallsToBeVerified)
-            {
-                methodCallsToBeVerified();
-                _mocks.VerifyAll();
-            }
         }
+
+        #endregion
+
+        #region Nested type: IMockVerifier
 
         /// <summary>
         /// Interface to verify previously defined expectations
@@ -144,7 +181,12 @@ namespace Rhino.Mocks
             /// <summary>
             /// Verifies if a piece of code
             /// </summary>
+            /// <param name="methodCallsToBeVerified">
+            /// The method Calls To Be Verified.
+            /// </param>
             void Verify(Proc methodCallsToBeVerified);
         }
+
+        #endregion
     }
 }

@@ -1,10 +1,9 @@
 ﻿#region license
+
 // Copyright (c) 2005 - 2007 Ayende Rahien (ayende@ayende.com)
 // All rights reserved.
-// 
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
-// 
 //     * Redistributions of source code must retain the above copyright notice,
 //     this list of conditions and the following disclaimer.
 //     * Redistributions in binary form must reproduce the above copyright notice,
@@ -13,7 +12,6 @@
 //     * Neither the name of Ayende Rahien nor the names of its
 //     contributors may be used to endorse or promote products derived from this
 //     software without specific prior written permission.
-// 
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 // ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 // WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -26,41 +24,46 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
 
+using Mammock.Interfaces;
 
-using System;
-using Rhino.Mocks.Interfaces;
-
-namespace Rhino.Mocks.Impl
+namespace Mammock.Impl
 {
-	/// <summary>
-	/// Records all the expectations for a mock and
-	/// return a ReplayDynamicMockState when Replay()
-	/// is called.
-	/// </summary>
-	public class RecordDynamicMockState : RecordMockState
-	{
-		/// <summary>
-		/// Creates a new <see cref="RecordDynamicMockState"/> instance.
-		/// </summary>
-		/// <param name="repository">Repository.</param>
-		/// <param name="mockedObject">The proxy that generates the method calls</param>
-		public RecordDynamicMockState(IMockedObject mockedObject, MockRepository repository) : base(mockedObject, repository)
-		{
-		}
+    /// <summary>
+    /// Records all the expectations for a mock and
+    /// return a ReplayDynamicMockState when Replay()
+    /// is called.
+    /// </summary>
+    public class RecordDynamicMockState : RecordMockState
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RecordDynamicMockState"/> class. 
+        /// Creates a new <see cref="RecordDynamicMockState"/> instance.
+        /// </summary>
+        /// <param name="mockedObject">
+        /// The proxy that generates the method calls
+        /// </param>
+        /// <param name="repository">
+        /// Repository.
+        /// </param>
+        public RecordDynamicMockState(IMockedObject mockedObject, MockRepository repository)
+            : base(mockedObject, repository)
+        {
+        }
 
-		/// <summary>
-		/// Verify that we can move to replay state and move 
-		/// to the reply state.
-		/// </summary>
-		protected override IMockState DoReplay()
-		{
-			return new ReplayDynamicMockState(this);
-		}
+        /// <summary>
+        /// Verify that we can move to replay state and move 
+        /// to the reply state.
+        /// </summary>
+        protected override IMockState DoReplay()
+        {
+            return new ReplayDynamicMockState(this);
+        }
 
         /// <summary>
         /// Get the default call count range expectation
         /// </summary>
-        /// <returns></returns>
+        /// <returns>
+        /// </returns>
         protected override Range GetDefaultCallCountRangeExpectation()
         {
             return new Range(1, null);
@@ -73,5 +76,5 @@ namespace Rhino.Mocks.Impl
         {
             return new RecordDynamicMockState(this.Proxy, Repository);
         }
-	}
+    }
 }

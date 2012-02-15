@@ -31,10 +31,10 @@ using System;
 using System.IO;
 using System.Reflection;
 using Xunit;
-using Rhino.Mocks.Exceptions;
-using Rhino.Mocks.Interfaces;
+using Mammock.Exceptions;
+using Mammock.Interfaces;
 
-namespace Rhino.Mocks.Tests
+namespace Mammock.Tests
 {
     public delegate object ObjectDelegateWithNoParams();
 

@@ -1,10 +1,9 @@
 ﻿#region license
+
 // Copyright (c) 2005 - 2007 Ayende Rahien (ayende@ayende.com)
 // All rights reserved.
-// 
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
-// 
 //     * Redistributions of source code must retain the above copyright notice,
 //     this list of conditions and the following disclaimer.
 //     * Redistributions in binary form must reproduce the above copyright notice,
@@ -13,7 +12,6 @@
 //     * Neither the name of Ayende Rahien nor the names of its
 //     contributors may be used to endorse or promote products derived from this
 //     software without specific prior written permission.
-// 
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 // ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 // WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -26,47 +24,58 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
 
-
 using System;
-using Rhino.Mocks.Constraints;
 
-namespace Rhino.Mocks.Constraints
+namespace Mammock.Constraints
 {
-	/*
+/*
 	 * Class: Property
 	 * 
 	 * Constraints for dealing with object's properties
-	 */ 
-	/// <summary>
-	/// Central location for constraints for object's properties
-	/// </summary>
-	public static class Property
-	{
-		/*
+	 */
+
+    /// <summary>
+    /// Central location for constraints for object's properties
+    /// </summary>
+    public static class Property
+    {
+        /*
 		 * Method: Value
 		 * 
 		 * Determines that the parameter has property with the specified value
 		 * 
-		 */ 
+		 */
 
         /// <summary>
-		/// Constrains the parameter to have property with the specified value
-		/// </summary>
-		/// <param name="propertyName">Name of the property.</param>
-		/// <param name="expectedValue">Expected value.</param>
-		/// <returns></returns>
-		public static AbstractConstraint Value(string propertyName, object expectedValue)
-		{
-			return new PropertyIs(propertyName, expectedValue);
-		}
+        /// Constrains the parameter to have property with the specified value
+        /// </summary>
+        /// <param name="propertyName">
+        /// Name of the property.
+        /// </param>
+        /// <param name="expectedValue">
+        /// Expected value.
+        /// </param>
+        /// <returns>
+        /// </returns>
+        public static AbstractConstraint Value(string propertyName, object expectedValue)
+        {
+            return new PropertyIs(propertyName, expectedValue);
+        }
 
         /// <summary>
         /// Constrains the parameter to have property with the specified value.
         /// </summary>
-        /// <param name="declaringType">The type that declares the property, used to disambiguate between properties.</param>
-        /// <param name="propertyName">Name of the property.</param>
-        /// <param name="expectedValue">Expected value.</param>
-        /// <returns></returns>
+        /// <param name="declaringType">
+        /// The type that declares the property, used to disambiguate between properties.
+        /// </param>
+        /// <param name="propertyName">
+        /// Name of the property.
+        /// </param>
+        /// <param name="expectedValue">
+        /// Expected value.
+        /// </param>
+        /// <returns>
+        /// </returns>
         public static AbstractConstraint Value(Type declaringType, string propertyName, object expectedValue)
         {
             return new PropertyIs(declaringType, propertyName, expectedValue);
@@ -75,8 +84,12 @@ namespace Rhino.Mocks.Constraints
         /// <summary>
         /// Constrains the parameter to have a property satisfying a specified constraint.
         /// </summary>
-        /// <param name="propertyName">Name of the property.</param>
-        /// <param name="propertyConstraint">Constraint for the property.</param>
+        /// <param name="propertyName">
+        /// Name of the property.
+        /// </param>
+        /// <param name="propertyConstraint">
+        /// Constraint for the property.
+        /// </param>
         public static AbstractConstraint ValueConstraint(string propertyName, AbstractConstraint propertyConstraint)
         {
             return new PropertyConstraint(propertyName, propertyConstraint);
@@ -85,63 +98,88 @@ namespace Rhino.Mocks.Constraints
         /// <summary>
         /// Constrains the parameter to have a property satisfying a specified constraint.
         /// </summary>
-        /// <param name="declaringType">The type that declares the property, used to disambiguate between properties.</param>
-        /// <param name="propertyName">Name of the property.</param>
-        /// <param name="propertyConstraint">Constraint for the property.</param>
-        public static AbstractConstraint ValueConstraint(Type declaringType, string propertyName, AbstractConstraint propertyConstraint)
+        /// <param name="declaringType">
+        /// The type that declares the property, used to disambiguate between properties.
+        /// </param>
+        /// <param name="propertyName">
+        /// Name of the property.
+        /// </param>
+        /// <param name="propertyConstraint">
+        /// Constraint for the property.
+        /// </param>
+        public static AbstractConstraint ValueConstraint(Type declaringType, string propertyName, 
+                                                         AbstractConstraint propertyConstraint)
         {
             return new PropertyConstraint(declaringType, propertyName, propertyConstraint);
         }
 
-		/*
+        /*
 		 * Method: IsNull
 		 * 
 		 * Determines that the parameter has property with null value
 		 * 
-		 */ 
-		/// <summary>
-		/// Determines whether the parameter has the specified property and that it is null.
-		/// </summary>
-		/// <param name="propertyName">Name of the property.</param>
-		/// <returns></returns>
-		public static AbstractConstraint IsNull(string propertyName)
-		{
-			return new PropertyIs(propertyName, null);
-		}
+		 */
 
         /// <summary>
         /// Determines whether the parameter has the specified property and that it is null.
         /// </summary>
-        /// <param name="declaringType">The type that declares the property, used to disambiguate between properties.</param>
-        /// <param name="propertyName">Name of the property.</param>
-        /// <returns></returns>
+        /// <param name="propertyName">
+        /// Name of the property.
+        /// </param>
+        /// <returns>
+        /// </returns>
+        public static AbstractConstraint IsNull(string propertyName)
+        {
+            return new PropertyIs(propertyName, null);
+        }
+
+        /// <summary>
+        /// Determines whether the parameter has the specified property and that it is null.
+        /// </summary>
+        /// <param name="declaringType">
+        /// The type that declares the property, used to disambiguate between properties.
+        /// </param>
+        /// <param name="propertyName">
+        /// Name of the property.
+        /// </param>
+        /// <returns>
+        /// </returns>
         public static AbstractConstraint IsNull(Type declaringType, string propertyName)
         {
             return new PropertyIs(declaringType, propertyName, null);
         }
 
-		/*
+        /*
 		 * Method: IsNotNull
 		 * 
 		 * Determines that the parameter has property with non-null value
 		 * 
-		 */ 
-		/// <summary>
-		/// Determines whether the parameter has the specified property and that it is not null.
-		/// </summary>
-		/// <param name="propertyName">Name of the property.</param>
-		/// <returns></returns>
-		public static AbstractConstraint IsNotNull(string propertyName)
-		{
-			return !new PropertyIs(propertyName, null);
-		}
+		 */
 
         /// <summary>
         /// Determines whether the parameter has the specified property and that it is not null.
         /// </summary>
-        /// <param name="declaringType">The type that declares the property, used to disambiguate between properties.</param>
-        /// <param name="propertyName">Name of the property.</param>
-        /// <returns></returns>
+        /// <param name="propertyName">
+        /// Name of the property.
+        /// </param>
+        /// <returns>
+        /// </returns>
+        public static AbstractConstraint IsNotNull(string propertyName)
+        {
+            return !new PropertyIs(propertyName, null);
+        }
+
+        /// <summary>
+        /// Determines whether the parameter has the specified property and that it is not null.
+        /// </summary>
+        /// <param name="declaringType">
+        /// The type that declares the property, used to disambiguate between properties.
+        /// </param>
+        /// <param name="propertyName">
+        /// Name of the property.
+        /// </param>
+        /// <returns>
+        /// </returns>
         public static AbstractConstraint IsNotNull(Type declaringType, string propertyName)
         {
             return !new PropertyIs(declaringType, propertyName, null);
@@ -150,8 +188,12 @@ namespace Rhino.Mocks.Constraints
         /// <summary>
         /// constraints the parameter to have the exact same property values as the expected object.
         /// </summary>
-        /// <param name="expected">An object, of the same type as the parameter, whose properties are set with the expected values.</param>
-        /// <returns>An instance of the constraint that will do the actual check.</returns>
+        /// <param name="expected">
+        /// An object, of the same type as the parameter, whose properties are set with the expected values.
+        /// </param>
+        /// <returns>
+        /// An instance of the constraint that will do the actual check.
+        /// </returns>
         /// <remarks>
         /// The parameter's public property values and public field values will be matched against the expected object's
         /// public property values and public field values. The first mismatch will be reported and no further matching is done.
@@ -164,5 +206,5 @@ namespace Rhino.Mocks.Constraints
         {
             return new AllPropertiesMatchConstraint(expected);
         }
-	}
+    }
 }

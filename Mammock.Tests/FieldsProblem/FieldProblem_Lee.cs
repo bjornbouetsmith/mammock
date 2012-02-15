@@ -1,9 +1,9 @@
-namespace Rhino.Mocks.Tests.FieldsProblem
+namespace Mammock.Tests.FieldsProblem
 {
 	using System;
 	using System.Collections.Generic;
 	using Xunit;
-	using Rhino.Mocks.Constraints;
+	using Mammock.Constraints;
 
 	
 	public class FieldProblem_Lee

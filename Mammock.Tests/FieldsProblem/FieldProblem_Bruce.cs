@@ -30,9 +30,9 @@
 using System;
 using System.Text;
 using Xunit;
-using Rhino.Mocks.Impl;
+using Mammock.Impl;
 
-namespace Rhino.Mocks.Tests.FieldsProblem
+namespace Mammock.Tests.FieldsProblem
 {
     
     public class FieldProblem_Bruce

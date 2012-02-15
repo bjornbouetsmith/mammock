@@ -29,7 +29,7 @@
 
 using System;
 
-namespace Rhino.Mocks.Tests.Remoting
+namespace Mammock.Tests.Remoting
 {
 
 	[Serializable]

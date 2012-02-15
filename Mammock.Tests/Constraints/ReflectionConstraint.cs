@@ -31,9 +31,9 @@ using System;
 using System.Collections;
 using System.Reflection;
 using Xunit;
-using Rhino.Mocks.Constraints;
+using Mammock.Constraints;
 
-namespace Rhino.Mocks.Tests.Constraints
+namespace Mammock.Tests.Constraints
 {
 	
 	public class ReflectionConstraint

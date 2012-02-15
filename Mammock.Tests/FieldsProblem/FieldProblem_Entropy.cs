@@ -30,9 +30,9 @@
 using System;
 using System.Text;
 using Xunit;
-using Rhino.Mocks.Exceptions;
+using Mammock.Exceptions;
 
-namespace Rhino.Mocks.Tests.FieldsProblem
+namespace Mammock.Tests.FieldsProblem
 {
 
     public class FieldProblem_Entropy

@@ -1,10 +1,9 @@
 ﻿#region license
+
 // Copyright (c) 2005 - 2007 Ayende Rahien (ayende@ayende.com)
 // All rights reserved.
-// 
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
-// 
 //     * Redistributions of source code must retain the above copyright notice,
 //     this list of conditions and the following disclaimer.
 //     * Redistributions in binary form must reproduce the above copyright notice,
@@ -13,7 +12,6 @@
 //     * Neither the name of Ayende Rahien nor the names of its
 //     contributors may be used to endorse or promote products derived from this
 //     software without specific prior written permission.
-// 
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 // ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 // WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -26,91 +24,111 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
 
-
-using System;
-using System.Globalization;
 using System.Reflection;
+using Mammock.Impl;
+using Mammock.Interfaces;
 
-using Rhino.Mocks.Impl;
-using Rhino.Mocks.Interfaces;
-
-namespace Rhino.Mocks.MethodRecorders
+namespace Mammock.MethodRecorders
 {
-	/// <summary>
-	/// Hold an expectation for a method call on an object
-	/// </summary>
-	public class ProxyMethodExpectationTriplet
-	{
-		private object proxy;
-		private MethodInfo method;
-		private IExpectation expectation;
-		
-		/// <summary>
-		/// Creates a new <see cref="ProxyMethodExpectationTriplet"/> instance.
-		/// </summary>
-		/// <param name="proxy">Proxy.</param>
-		/// <param name="method">Method.</param>
-		/// <param name="expectation">Expectation.</param>
-		public ProxyMethodExpectationTriplet(object proxy, MethodInfo method, IExpectation expectation)
-		{
-			Validate.IsNotNull(proxy, "proxy");
-			Validate.IsNotNull(method, "method");
-			Validate.IsNotNull(expectation, "expectation");
-			this.proxy = proxy;
-			this.method = method;
-			this.expectation = expectation;
-		}
+    /// <summary>
+    /// Hold an expectation for a method call on an object
+    /// </summary>
+    public class ProxyMethodExpectationTriplet
+    {
+        /// <summary>
+        /// The method.
+        /// </summary>
+        private readonly MethodInfo method;
 
-		/// <summary>
-		/// Gets the proxy.
-		/// </summary>
-		/// <value></value>
-		public object Proxy
-		{
-			get { return proxy; }
-		}
+        /// <summary>
+        /// The proxy.
+        /// </summary>
+        private readonly object proxy;
 
-		/// <summary>
-		/// Gets the method.
-		/// </summary>
-		/// <value></value>
-		public MethodInfo Method
-		{
-			get { return method; }
-		}
+        /// <summary>
+        /// The expectation.
+        /// </summary>
+        private IExpectation expectation;
 
-		/// <summary>
-		/// Gets the expectation.
-		/// </summary>
-		/// <value></value>
-		public IExpectation Expectation
-		{
-			get { return expectation; }
-			set { expectation = value; }
-		}
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ProxyMethodExpectationTriplet"/> class. 
+        /// Creates a new <see cref="ProxyMethodExpectationTriplet"/> instance.
+        /// </summary>
+        /// <param name="proxy">
+        /// Proxy.
+        /// </param>
+        /// <param name="method">
+        /// Method.
+        /// </param>
+        /// <param name="expectation">
+        /// Expectation.
+        /// </param>
+        public ProxyMethodExpectationTriplet(object proxy, MethodInfo method, IExpectation expectation)
+        {
+            Validate.IsNotNull(proxy, "proxy");
+            Validate.IsNotNull(method, "method");
+            Validate.IsNotNull(expectation, "expectation");
+            this.proxy = proxy;
+            this.method = method;
+            this.expectation = expectation;
+        }
 
-		/// <summary>
-		/// Determines if the object equal to this instance
-		/// </summary>
-		/// <param name="obj">Obj.</param>
-		/// <returns></returns>
-		public override bool Equals(object obj)
-		{
-			ProxyMethodExpectationTriplet other = obj as ProxyMethodExpectationTriplet;
-			if (other == null)
-				return false;
-			return method == other.method &&
-                MockedObjectsEquality.Instance.Compare(proxy, other.proxy) == 0 &&
-				expectation == other.expectation;
-		}
+        /// <summary>
+        /// Gets the proxy.
+        /// </summary>
+        /// <value></value>
+        public object Proxy
+        {
+            get { return proxy; }
+        }
 
-		/// <summary>
-		/// Gets the hash code.
-		/// </summary>
-		/// <returns></returns>
-		public override int GetHashCode()
-		{
-			return method.GetHashCode() + MockedObjectsEquality.Instance.GetHashCode(proxy) + expectation.GetHashCode();
-		}
-	}
+        /// <summary>
+        /// Gets the method.
+        /// </summary>
+        /// <value></value>
+        public MethodInfo Method
+        {
+            get { return method; }
+        }
+
+        /// <summary>
+        /// Gets the expectation.
+        /// </summary>
+        /// <value></value>
+        public IExpectation Expectation
+        {
+            get { return expectation; }
+            set { expectation = value; }
+        }
+
+        /// <summary>
+        /// Determines if the object equal to this instance
+        /// </summary>
+        /// <param name="obj">
+        /// Obj.
+        /// </param>
+        /// <returns>
+        /// The equals.
+        /// </returns>
+        public override bool Equals(object obj)
+        {
+            ProxyMethodExpectationTriplet other = obj as ProxyMethodExpectationTriplet;
+            if (other == null)
+                return false;
+            return method == other.method &&
+                   MockedObjectsEquality.Instance.Compare(proxy, other.proxy) == 0 &&
+                   expectation == other.expectation;
+        }
+
+        /// <summary>
+        /// Gets the hash code.
+        /// </summary>
+        /// <returns>
+        /// The get hash code.
+        /// </returns>
+        public override int GetHashCode()
+        {
+            return method.GetHashCode() + MockedObjectsEquality.Instance.GetHashCode(proxy) + expectation.GetHashCode();
+        }
+    }
 }

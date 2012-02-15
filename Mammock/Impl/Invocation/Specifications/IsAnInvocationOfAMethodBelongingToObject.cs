@@ -1,24 +1,41 @@
 using System;
 using System.Reflection;
 using Castle.DynamicProxy;
-using Rhino.Mocks.Impl.InvocationSpecifications;
+using Mammock.Impl.InvocationSpecifications;
 
-namespace Rhino.Mocks.Impl.Invocation.Specifications
+namespace Mammock.Impl.Invocation.Specifications
 {
-    ///<summary>
-    ///</summary>
+    /// <summary>
+    /// The is an invocation of a method belonging to object.
+    /// </summary>
     public class IsAnInvocationOfAMethodBelongingToObject : ISpecification<IInvocation>
     {
-        private static MethodInfo[] objectMethods =
-            new MethodInfo[]
-            {
-                typeof (object).GetMethod("ToString"), typeof (object).GetMethod("Equals", new Type[] {typeof (object)}),
-                typeof (object).GetMethod("GetHashCode"), typeof (object).GetMethod("GetType")
-            };
+        /// <summary>
+        /// The object methods.
+        /// </summary>
+        private static readonly MethodInfo[] objectMethods =
+            new[]
+                {
+                    typeof (object).GetMethod("ToString"), typeof (object).GetMethod("Equals", new[] {typeof (object)}), 
+                    typeof (object).GetMethod("GetHashCode"), typeof (object).GetMethod("GetType")
+                };
 
+        #region ISpecification<IInvocation> Members
+
+        /// <summary>
+        /// The is satisfied by.
+        /// </summary>
+        /// <param name="item">
+        /// The item.
+        /// </param>
+        /// <returns>
+        /// The is satisfied by.
+        /// </returns>
         public bool IsSatisfiedBy(IInvocation item)
         {
             return Array.IndexOf(objectMethods, item.Method) != -1;
         }
+
+        #endregion
     }
 }

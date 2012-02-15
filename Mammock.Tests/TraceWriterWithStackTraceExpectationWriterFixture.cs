@@ -1,8 +1,8 @@
-namespace Rhino.Mocks.Tests
+namespace Mammock.Tests
 {
 	using System.IO;
 	using Xunit;
-	using Rhino.Mocks.Impl;
+	using Mammock.Impl;
 
 	
 	public class TraceWriterWithStackTraceExpectationWriterFixture

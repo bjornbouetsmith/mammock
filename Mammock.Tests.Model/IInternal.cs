@@ -1,4 +1,4 @@
-namespace Rhino.Mocks.Tests.Model
+namespace Mammock.Tests.Model
 {
 	internal interface IInternal
 	{

@@ -26,15 +26,11 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
 
-
-using System;
-using System.Text;
-using Rhino.Mocks;
 using System.Data;
+using Mammock.Exceptions;
 using Xunit;
-using Rhino.Mocks.Exceptions;
 
-namespace Rhino.Mocks.Tests
+namespace Mammock.Tests
 {
 
     public class Metric : IMetric
@@ -111,8 +107,8 @@ namespace Rhino.Mocks.Tests
 
             using (m_objMockRepository.Ordered())
             {
-                Rhino.Mocks.Expect.Call(m_objIApplication.IMetricBroker).Return(m_objIMetricBroker);
-                Rhino.Mocks.Expect.Call(m_objIMetricBroker.FetchMetric("Risk")).Return(m_objDSRatioMetric);
+                Expect.Call(m_objIApplication.IMetricBroker).Return(m_objIMetricBroker);
+                Expect.Call(m_objIMetricBroker.FetchMetric("Risk")).Return(m_objDSRatioMetric);
             }
             m_objMockRepository.ReplayAll();
 
@@ -131,11 +127,11 @@ namespace Rhino.Mocks.Tests
 
             using (m_objMockRepository.Ordered())
             {
-                Rhino.Mocks.Expect.Call(m_objIApplication.IMetricBroker).Return(m_objIMetricBroker);
-                Rhino.Mocks.Expect.Call(m_objIMetricBroker.FetchMetric(lOtherID)).Return(objDSOtherMetric);
+                Expect.Call(m_objIApplication.IMetricBroker).Return(m_objIMetricBroker);
+                Expect.Call(m_objIMetricBroker.FetchMetric(lOtherID)).Return(objDSOtherMetric);
             }
             m_objMockRepository.ReplayAll();
-
+            
             IMetric objOtherMetric = Metric.GetByID(m_objIApplication, lOtherID);
             m_objMockRepository.VerifyAll();
 

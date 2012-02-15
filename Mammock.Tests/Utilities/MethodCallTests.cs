@@ -30,9 +30,9 @@
 using System;
 using System.Reflection;
 using Xunit;
-using Rhino.Mocks.Utilities;
+using Mammock.Utilities;
 
-namespace Rhino.Mocks.Tests.Utilities
+namespace Mammock.Tests.Utilities
 {
 	
 	public class MethodCallTests

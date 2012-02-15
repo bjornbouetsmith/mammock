@@ -31,7 +31,7 @@ using System;
 using System.EnterpriseServices;
 using Xunit;
 
-namespace Rhino.Mocks.Tests.FieldsProblem
+namespace Mammock.Tests.FieldsProblem
 {
     public interface ISomething
     {

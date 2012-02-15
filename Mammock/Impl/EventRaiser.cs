@@ -1,10 +1,9 @@
 ﻿#region license
+
 // Copyright (c) 2005 - 2007 Ayende Rahien (ayende@ayende.com)
 // All rights reserved.
-// 
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
-// 
 //     * Redistributions of source code must retain the above copyright notice,
 //     this list of conditions and the following disclaimer.
 //     * Redistributions in binary form must reproduce the above copyright notice,
@@ -13,7 +12,6 @@
 //     * Neither the name of Ayende Rahien nor the names of its
 //     contributors may be used to endorse or promote products derived from this
 //     software without specific prior written permission.
-// 
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 // ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 // WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -26,117 +24,167 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
 
-
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Text;
-using Rhino.Mocks.Interfaces;
-using Rhino.Mocks.Utilities;
+using Mammock.Interfaces;
 
-namespace Rhino.Mocks.Impl
+namespace Mammock.Impl
 {
-	/// <summary>
-	/// Raise events for all subscribers for an event
-	/// </summary>
-	public class EventRaiser : IEventRaiser
-	{
-		string eventName;
-		IMockedObject proxy;
+    /// <summary>
+    /// Raise events for all subscribers for an event
+    /// </summary>
+    public class EventRaiser : IEventRaiser
+    {
+        /// <summary>
+        /// The event name.
+        /// </summary>
+        private readonly string eventName;
 
-		///<summary>
-		/// Create an event raiser for the specified event on this instance.
-		///</summary>
-		public static IEventRaiser Create(object instance, string eventName)
-		{
-			IMockedObject proxy = instance as IMockedObject;
-			if (proxy == null)
-				throw new ArgumentException("Parameter must be a mocked object", "instance");
-			return new EventRaiser(proxy, eventName);
-		}
+        /// <summary>
+        /// The proxy.
+        /// </summary>
+        private readonly IMockedObject proxy;
 
-		/// <summary>
-		/// Creates a new instance of <c>EventRaiser</c>
-		/// </summary>
-		public EventRaiser(IMockedObject proxy, string eventName)
-		{
-			this.eventName = eventName;
-			this.proxy = proxy;
-		}
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EventRaiser"/> class. 
+        /// Creates a new instance of <c>EventRaiser</c>
+        /// </summary>
+        /// <param name="proxy">
+        /// The proxy.
+        /// </param>
+        /// <param name="eventName">
+        /// The event Name.
+        /// </param>
+        public EventRaiser(IMockedObject proxy, string eventName)
+        {
+            this.eventName = eventName;
+            this.proxy = proxy;
+        }
 
-		#region IEventRaiser Members
+        #region IEventRaiser Members
 
-		/// <summary>
-		/// Raise the event
-		/// </summary>
-		public void Raise(params object[] args)
-		{
-			Delegate subscribed = proxy.GetEventSubscribers(eventName);
-			if (subscribed != null)
-			{
-				AssertMatchingParameters(subscribed.Method, args);
-			    try
-			    {
-			        subscribed.DynamicInvoke(args);
-			    }
-			    catch (TargetInvocationException e)
-			    {
-			        PreserveStackTrace(e.InnerException);
-			        throw e.InnerException;
-			    }
-			}
-		}
+        /// <summary>
+        /// Raise the event
+        /// </summary>
+        /// <param name="args">
+        /// The args.
+        /// </param>
+        public void Raise(params object[] args)
+        {
+            Delegate subscribed = proxy.GetEventSubscribers(eventName);
+            if (subscribed != null)
+            {
+                AssertMatchingParameters(subscribed.Method, args);
+                try
+                {
+                    subscribed.DynamicInvoke(args);
+                }
+                catch (TargetInvocationException e)
+                {
+                    PreserveStackTrace(e.InnerException);
+                    throw e.InnerException;
+                }
+            }
+        }
 
+        /// <summary>
+        /// The most common signature for events
+        /// Here to allow intellisense to make better guesses about how 
+        /// it should suggest parameters.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
+        public void Raise(object sender, EventArgs e)
+        {
+            Raise(new[] {sender, e});
+        }
+
+        #endregion
+
+        /// <summary>
+        /// Create an event raiser for the specified event on this instance.
+        /// </summary>
+        /// <param name="instance">
+        /// The instance.
+        /// </param>
+        /// <param name="eventName">
+        /// The event Name.
+        /// </param>
+        public static IEventRaiser Create(object instance, string eventName)
+        {
+            IMockedObject proxy = instance as IMockedObject;
+            if (proxy == null)
+                throw new ArgumentException("Parameter must be a mocked object", "instance");
+            return new EventRaiser(proxy, eventName);
+        }
+
+        /// <summary>
+        /// The preserve stack trace.
+        /// </summary>
+        /// <param name="exception">
+        /// The exception.
+        /// </param>
         private static void PreserveStackTrace(Exception exception)
         {
-            MethodInfo preserveStackTrace = typeof(Exception).GetMethod("InternalPreserveStackTrace",
-              BindingFlags.Instance | BindingFlags.NonPublic);
+            MethodInfo preserveStackTrace = typeof (Exception).GetMethod("InternalPreserveStackTrace", 
+                                                                         BindingFlags.Instance | BindingFlags.NonPublic);
             preserveStackTrace.Invoke(exception, null);
         }
 
-		private static void AssertMatchingParameters(MethodInfo method, object[] args)
-		{
-			ParameterInfo[] parameterInfos = method.GetParameters();
-			int paramsCount = parameterInfos.Length;
-			if(args== null || args.Length != paramsCount)
-			{
-				int actualCount;
-				if(args==null)
-					actualCount = 0;
-				else 
-					actualCount = args.Length;
-				string msg = string.Format("You have called the event raiser with the wrong number of parameters. Expected {0} but was {1}", paramsCount, actualCount);
-				throw new InvalidOperationException(msg);
-			}
-			List<string> errors = new List<string>();
-			for (int i = 0; i < parameterInfos.Length; i++)
-			{
-				if ((args[i] == null && parameterInfos[i].ParameterType.IsValueType) ||
-					(args[i] != null && parameterInfos[i].ParameterType.IsInstanceOfType(args[i])==false))
-				{
-					string type = "null";
-					if(args[i]!=null)
-						type = args[i].GetType().FullName;
-					errors.Add("Parameter #" + (i+1) + " is " + type + " but should be " +
-														parameterInfos[i].ParameterType);
-				}
-			}
-			if(errors.Count>0)
-			{
-				throw new InvalidOperationException(string.Join(Environment.NewLine, errors.ToArray()));
-			}
-		}
+        /// <summary>
+        /// The assert matching parameters.
+        /// </summary>
+        /// <param name="method">
+        /// The method.
+        /// </param>
+        /// <param name="args">
+        /// The args.
+        /// </param>
+        /// <exception cref="InvalidOperationException">
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        /// </exception>
+        private static void AssertMatchingParameters(MethodInfo method, object[] args)
+        {
+            ParameterInfo[] parameterInfos = method.GetParameters();
+            int paramsCount = parameterInfos.Length;
+            if (args == null || args.Length != paramsCount)
+            {
+                int actualCount;
+                if (args == null)
+                    actualCount = 0;
+                else
+                    actualCount = args.Length;
+                string msg =
+                    string.Format(
+                        "You have called the event raiser with the wrong number of parameters. Expected {0} but was {1}", 
+                        paramsCount, actualCount);
+                throw new InvalidOperationException(msg);
+            }
 
-		/// <summary>
-		/// The most common signature for events
-		/// Here to allow intellisense to make better guesses about how 
-		/// it should suggest parameters.
-		/// </summary>
-		public void Raise(object sender, EventArgs e)
-		{
-			Raise(new object[] { sender, e });
-		}
+            List<string> errors = new List<string>();
+            for (int i = 0; i < parameterInfos.Length; i++)
+            {
+                if ((args[i] == null && parameterInfos[i].ParameterType.IsValueType) ||
+                    (args[i] != null && parameterInfos[i].ParameterType.IsInstanceOfType(args[i]) == false))
+                {
+                    string type = "null";
+                    if (args[i] != null)
+                        type = args[i].GetType().FullName;
+                    errors.Add("Parameter #" + (i + 1) + " is " + type + " but should be " +
+                               parameterInfos[i].ParameterType);
+                }
+            }
 
-		#endregion
-	}
+            if (errors.Count > 0)
+            {
+                throw new InvalidOperationException(string.Join(Environment.NewLine, errors.ToArray()));
+            }
+        }
+    }
 }

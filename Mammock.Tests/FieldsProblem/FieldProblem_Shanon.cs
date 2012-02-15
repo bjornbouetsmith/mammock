@@ -1,7 +1,7 @@
 using Xunit;
 using RhinoMocksCPPInterfaces;
 
-namespace Rhino.Mocks.Tests.FieldsProblem
+namespace Mammock.Tests.FieldsProblem
 {
 	
 	public class FieldProblem_Shanon

@@ -30,11 +30,11 @@
 using System;
 using System.Text;
 using Xunit;
-using Rhino.Mocks.Exceptions;
-using Rhino.Mocks.Interfaces;
-using Rhino.Mocks.Tests.FieldsProblem;
+using Mammock.Exceptions;
+using Mammock.Interfaces;
+using Mammock.Tests.FieldsProblem;
 
-namespace Rhino.Mocks.Tests
+namespace Mammock.Tests
 {
 
     public class BackToRecord

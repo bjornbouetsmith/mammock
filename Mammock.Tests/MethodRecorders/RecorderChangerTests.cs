@@ -29,14 +29,14 @@
 
 using System.Reflection;
 using Xunit;
-using Rhino.Mocks.Expectations;
-using Rhino.Mocks.Impl;
-using Rhino.Mocks.Interfaces;
-using Rhino.Mocks.MethodRecorders;
-using Rhino.Mocks.Tests.Expectations;
-using Rhino.Mocks.Tests.Impl;
+using Mammock.Expectations;
+using Mammock.Impl;
+using Mammock.Interfaces;
+using Mammock.MethodRecorders;
+using Mammock.Tests.Expectations;
+using Mammock.Tests.Impl;
 
-namespace Rhino.Mocks.Tests.MethodRecorders
+namespace Mammock.Tests.MethodRecorders
 {
 	using Generated;
 

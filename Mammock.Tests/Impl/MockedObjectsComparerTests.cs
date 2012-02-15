@@ -29,9 +29,9 @@
 
 using System;
 using Xunit;
-using Rhino.Mocks.Impl;
+using Mammock.Impl;
 
-namespace Rhino.Mocks.Tests.Impl
+namespace Mammock.Tests.Impl
 {
 		
 	public class MockedObjectsComparerTests

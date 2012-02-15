@@ -1,10 +1,9 @@
 ﻿#region license
+
 // Copyright (c) 2005 - 2007 Ayende Rahien (ayende@ayende.com)
 // All rights reserved.
-// 
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
-// 
 //     * Redistributions of source code must retain the above copyright notice,
 //     this list of conditions and the following disclaimer.
 //     * Redistributions in binary form must reproduce the above copyright notice,
@@ -13,7 +12,6 @@
 //     * Neither the name of Ayende Rahien nor the names of its
 //     contributors may be used to endorse or promote products derived from this
 //     software without specific prior written permission.
-// 
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 // ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 // WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -26,14 +24,12 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
 
-
-using System;
 using System.Collections;
-using System.Threading;
-using Rhino.Mocks.Interfaces;
 using System.Collections.Generic;
+using System.Threading;
+using Mammock.Interfaces;
 
-namespace Rhino.Mocks.Impl
+namespace Mammock.Impl
 {
     /// <summary>
     /// This class will provide hash code for hashtables without needing
@@ -43,9 +39,22 @@ namespace Rhino.Mocks.Impl
     /// </summary>
     public class MockedObjectsEquality : IComparer, IEqualityComparer, IEqualityComparer<object>
     {
+        /// <summary>
+        /// The instance.
+        /// </summary>
         private static readonly MockedObjectsEquality instance = new MockedObjectsEquality();
 
-        private static int baseHashcode = 0;
+        /// <summary>
+        /// The base hashcode.
+        /// </summary>
+        private static int baseHashcode;
+
+        /// <summary>
+        /// Prevents a default instance of the <see cref="MockedObjectsEquality"/> class from being created.
+        /// </summary>
+        private MockedObjectsEquality()
+        {
+        }
 
         /// <summary>
         /// The next hash code value for a mock object.
@@ -53,10 +62,7 @@ namespace Rhino.Mocks.Impl
         /// </summary>
         public static int NextHashCode
         {
-            get
-            {
-                return Interlocked.Increment(ref baseHashcode);
-            }
+            get { return Interlocked.Increment(ref baseHashcode); }
         }
 
         /// <summary>
@@ -67,21 +73,20 @@ namespace Rhino.Mocks.Impl
             get { return instance; }
         }
 
-        /// <summary>
-        /// Get the hash code for a proxy object without calling GetHashCode()
-        /// on the object.
-        /// </summary>
-        public int GetHashCode(object obj)
-        {
-            IMockedObject mockedObject = MockRepository.GetMockedObjectOrNull(obj);
-            if (mockedObject == null)
-                return obj.GetHashCode();
-            return mockedObject.ProxyHash;
-        }
+        #region IComparer Members
 
         /// <summary>
         /// Compares two instances of mocked objects
         /// </summary>
+        /// <param name="x">
+        /// The x.
+        /// </param>
+        /// <param name="y">
+        /// The y.
+        /// </param>
+        /// <returns>
+        /// The compare.
+        /// </returns>
         public int Compare(object x, object y)
         {
             if (x == null && y == null)
@@ -94,7 +99,7 @@ namespace Rhino.Mocks.Impl
             IMockedObject one = MockRepository.GetMockedObjectOrNull(x);
             IMockedObject two = MockRepository.GetMockedObjectOrNull(y);
             if (one == null && two == null)
-                return -2;//both of them are probably transperant proxies
+                return -2; // both of them are probably transperant proxies
             if (one == null)
                 return 1;
             if (two == null)
@@ -103,15 +108,40 @@ namespace Rhino.Mocks.Impl
             return one.ProxyHash - two.ProxyHash;
         }
 
-        private MockedObjectsEquality()
-        {
-        }
+        #endregion
 
         #region IEqualityComparer Members
 
         /// <summary>
+        /// Get the hash code for a proxy object without calling GetHashCode()
+        /// on the object.
+        /// </summary>
+        /// <param name="obj">
+        /// The obj.
+        /// </param>
+        /// <returns>
+        /// The get hash code.
+        /// </returns>
+        public int GetHashCode(object obj)
+        {
+            IMockedObject mockedObject = MockRepository.GetMockedObjectOrNull(obj);
+            if (mockedObject == null)
+                return obj.GetHashCode();
+            return mockedObject.ProxyHash;
+        }
+
+        /// <summary>
         /// Compare two mocked objects
         /// </summary>
+        /// <param name="x">
+        /// The x.
+        /// </param>
+        /// <param name="y">
+        /// The y.
+        /// </param>
+        /// <returns>
+        /// The equals.
+        /// </returns>
         public new bool Equals(object x, object y)
         {
             return Compare(x, y) == 0;
@@ -120,15 +150,38 @@ namespace Rhino.Mocks.Impl
         #endregion
 
         #region IEqualityComparer<object> Members
+
+        /// <summary>
+        /// The equals.
+        /// </summary>
+        /// <param name="x">
+        /// The x.
+        /// </param>
+        /// <param name="y">
+        /// The y.
+        /// </param>
+        /// <returns>
+        /// The equals.
+        /// </returns>
         bool System.Collections.Generic.IEqualityComparer<object>.Equals(object x, object y)
         {
             return Compare(x, y) == 0;
         }
 
+        /// <summary>
+        /// The get hash code.
+        /// </summary>
+        /// <param name="obj">
+        /// The obj.
+        /// </param>
+        /// <returns>
+        /// The get hash code.
+        /// </returns>
         int System.Collections.Generic.IEqualityComparer<object>.GetHashCode(object obj)
         {
             return this.GetHashCode(obj);
         }
+
         #endregion
     }
 }

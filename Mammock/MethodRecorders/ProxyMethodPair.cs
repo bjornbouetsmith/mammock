@@ -1,10 +1,9 @@
 ﻿#region license
+
 // Copyright (c) 2005 - 2007 Ayende Rahien (ayende@ayende.com)
 // All rights reserved.
-// 
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
-// 
 //     * Redistributions of source code must retain the above copyright notice,
 //     this list of conditions and the following disclaimer.
 //     * Redistributions in binary form must reproduce the above copyright notice,
@@ -13,7 +12,6 @@
 //     * Neither the name of Ayende Rahien nor the names of its
 //     contributors may be used to endorse or promote products derived from this
 //     software without specific prior written permission.
-// 
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 // ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 // WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -26,81 +24,94 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
 
-
-using System;
-using System.Globalization;
 using System.Reflection;
+using Mammock.Impl;
 
-using Rhino.Mocks.Impl;
-
-namespace Rhino.Mocks.MethodRecorders
+namespace Mammock.MethodRecorders
 {
-	/// <summary>
-	/// Holds a pair of mocked object and a method
-	/// and allows to compare them against each other.
-	/// This allows us to have a distinction between mockOne.MyMethod() and
-	/// mockTwo.MyMethod()...
-	/// </summary>
-	public class ProxyMethodPair
-	{
-		private object proxy;
-		private MethodInfo method;
+    /// <summary>
+    /// Holds a pair of mocked object and a method
+    /// and allows to compare them against each other.
+    /// This allows us to have a distinction between mockOne.MyMethod() and
+    /// mockTwo.MyMethod()...
+    /// </summary>
+    public class ProxyMethodPair
+    {
+        /// <summary>
+        /// The method.
+        /// </summary>
+        private readonly MethodInfo method;
 
-		/// <summary>
-		/// Creates a new <see cref="ProxyMethodPair"/> instance.
-		/// </summary>
-		/// <param name="proxy">Proxy.</param>
-		/// <param name="method">Method.</param>
-		public ProxyMethodPair(object proxy, MethodInfo method)
-		{
-			Validate.IsNotNull(proxy, "proxy");
-			Validate.IsNotNull(method, "method");
-			this.proxy = proxy;
-			this.method = method;
-		}
+        /// <summary>
+        /// The proxy.
+        /// </summary>
+        private readonly object proxy;
 
-		/// <summary>
-		/// Gets the proxy.
-		/// </summary>
-		/// <value></value>
-		public object Proxy
-		{
-			get { return proxy; }
-		}
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ProxyMethodPair"/> class. 
+        /// Creates a new <see cref="ProxyMethodPair"/> instance.
+        /// </summary>
+        /// <param name="proxy">
+        /// Proxy.
+        /// </param>
+        /// <param name="method">
+        /// Method.
+        /// </param>
+        public ProxyMethodPair(object proxy, MethodInfo method)
+        {
+            Validate.IsNotNull(proxy, "proxy");
+            Validate.IsNotNull(method, "method");
+            this.proxy = proxy;
+            this.method = method;
+        }
 
-		/// <summary>
-		/// Gets the method.
-		/// </summary>
-		/// <value></value>
-		public MethodInfo Method
-		{
-			get { return method; }
-		}
+        /// <summary>
+        /// Gets the proxy.
+        /// </summary>
+        /// <value></value>
+        public object Proxy
+        {
+            get { return proxy; }
+        }
 
-		/// <summary>
-		/// Determines whatever obj equals to this instance.
-		/// ProxyMethodPairs are equal when they point to the same /instance/ of
-		/// an object, and to the same method.
-		/// </summary>
-		/// <param name="obj">Obj.</param>
-		/// <returns></returns>
-		public override bool Equals(object obj)
-		{
-			ProxyMethodPair other = obj as ProxyMethodPair;
-			if (other == null)
-				return false;
-            return MockedObjectsEquality.Instance.Compare(other.proxy, proxy) == 0 && 
-				other.method == method;
+        /// <summary>
+        /// Gets the method.
+        /// </summary>
+        /// <value></value>
+        public MethodInfo Method
+        {
+            get { return method; }
+        }
 
-		}
+        /// <summary>
+        /// Determines whatever obj equals to this instance.
+        /// ProxyMethodPairs are equal when they point to the same /instance/ of
+        /// an object, and to the same method.
+        /// </summary>
+        /// <param name="obj">
+        /// Obj.
+        /// </param>
+        /// <returns>
+        /// The equals.
+        /// </returns>
+        public override bool Equals(object obj)
+        {
+            ProxyMethodPair other = obj as ProxyMethodPair;
+            if (other == null)
+                return false;
+            return MockedObjectsEquality.Instance.Compare(other.proxy, proxy) == 0 &&
+                   other.method == method;
+        }
 
-		/// <summary>
-		/// Gets the hash code.
-		/// </summary>
-		/// <returns></returns>
-		public override int GetHashCode()
-		{
-			return MockedObjectsEquality.Instance.GetHashCode(proxy) + method.GetHashCode();
-		}
-	}
+        /// <summary>
+        /// Gets the hash code.
+        /// </summary>
+        /// <returns>
+        /// The get hash code.
+        /// </returns>
+        public override int GetHashCode()
+        {
+            return MockedObjectsEquality.Instance.GetHashCode(proxy) + method.GetHashCode();
+        }
+    }
 }

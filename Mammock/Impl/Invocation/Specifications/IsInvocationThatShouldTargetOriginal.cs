@@ -1,27 +1,47 @@
 using Castle.DynamicProxy;
-using Rhino.Mocks.Impl.InvocationSpecifications;
-using Rhino.Mocks.Interfaces;
+using Mammock.Impl.InvocationSpecifications;
+using Mammock.Interfaces;
 
-namespace Rhino.Mocks.Impl.Invocation.Specifications
+namespace Mammock.Impl.Invocation.Specifications
 {
-    ///<summary>
-    ///</summary>
+    /// <summary>
+    /// The is invocation that should target original.
+    /// </summary>
     public class IsInvocationThatShouldTargetOriginal : ISpecification<IInvocation>
     {
-        readonly IMockedObject proxyInstance;
+        /// <summary>
+        /// The proxy instance.
+        /// </summary>
+        private readonly IMockedObject proxyInstance;
 
-        ///<summary>
-        ///</summary>
+        /// <summary>
+        /// Initializes a new instance of the <see cref="IsInvocationThatShouldTargetOriginal"/> class. 
+        /// The is invocation that should target original.
+        /// </summary>
+        /// <param name="proxyInstance">
+        /// The proxy Instance.
+        /// </param>
         public IsInvocationThatShouldTargetOriginal(IMockedObject proxyInstance)
         {
             this.proxyInstance = proxyInstance;
         }
 
-        ///<summary>
-        ///</summary>
+        #region ISpecification<IInvocation> Members
+
+        /// <summary>
+        /// The is satisfied by.
+        /// </summary>
+        /// <param name="item">
+        /// The item.
+        /// </param>
+        /// <returns>
+        /// The is satisfied by.
+        /// </returns>
         public bool IsSatisfiedBy(IInvocation item)
         {
             return proxyInstance.ShouldCallOriginal(item.GetConcreteMethod());
         }
+
+        #endregion
     }
 }

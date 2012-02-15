@@ -29,11 +29,11 @@
 
 using System;
 using Xunit;
-using Rhino.Mocks.Exceptions;
-using Rhino.Mocks.Impl;
-using Rhino.Mocks.Interfaces;
+using Mammock.Exceptions;
+using Mammock.Impl;
+using Mammock.Interfaces;
 
-namespace Rhino.Mocks.Tests.FieldsProblem
+namespace Mammock.Tests.FieldsProblem
 {
 	
 	public class UsingEvents

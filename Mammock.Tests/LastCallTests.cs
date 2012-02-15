@@ -29,12 +29,12 @@
 
 using System;
 using Xunit;
-using Rhino.Mocks.Constraints;
-using Rhino.Mocks.Exceptions;
-using Rhino.Mocks.Interfaces;
-using Rhino.Mocks.Tests.Callbacks;
+using Mammock.Constraints;
+using Mammock.Exceptions;
+using Mammock.Interfaces;
+using Mammock.Tests.Callbacks;
 
-namespace Rhino.Mocks.Tests
+namespace Mammock.Tests
 {
 	
 	public class LastCallTests : IDisposable

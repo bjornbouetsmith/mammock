@@ -1,7 +1,7 @@
-using Rhino.Mocks.Exceptions;
+using Mammock.Exceptions;
 using Xunit;
 
-namespace Rhino.Mocks.Tests.FieldsProblem
+namespace Mammock.Tests.FieldsProblem
 {
 
     public class FieldProblem_Robert

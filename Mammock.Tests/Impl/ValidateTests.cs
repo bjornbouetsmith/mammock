@@ -29,10 +29,10 @@
 
 using System;
 using Xunit;
-using Rhino.Mocks.Impl;
+using Mammock.Impl;
 using System.Collections;
 
-namespace Rhino.Mocks.Tests.Impl
+namespace Mammock.Tests.Impl
 {
 
     public class ValidateTests

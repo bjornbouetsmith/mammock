@@ -32,11 +32,11 @@ using System.Collections;
 using System.Reflection;
 using Castle.DynamicProxy;
 using Xunit;
-using Rhino.Mocks.Exceptions;
-using Rhino.Mocks.Impl;
-using Rhino.Mocks.Interfaces;
+using Mammock.Exceptions;
+using Mammock.Impl;
+using Mammock.Interfaces;
 
-namespace Rhino.Mocks.Tests
+namespace Mammock.Tests
 {
 	
 	public class ExtendingRhinoMocksFixture

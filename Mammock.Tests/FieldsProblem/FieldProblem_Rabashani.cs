@@ -1,7 +1,7 @@
 using Xunit;
-using Rhino.Mocks.Tests.Model;
+using Mammock.Tests.Model;
 
-namespace Rhino.Mocks.Tests.FieldsProblem
+namespace Mammock.Tests.FieldsProblem
 {
 
     

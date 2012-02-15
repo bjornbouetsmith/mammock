@@ -1,10 +1,9 @@
 ﻿#region license
+
 // Copyright (c) 2005 - 2007 Ayende Rahien (ayende@ayende.com)
 // All rights reserved.
-// 
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
-// 
 //     * Redistributions of source code must retain the above copyright notice,
 //     this list of conditions and the following disclaimer.
 //     * Redistributions in binary form must reproduce the above copyright notice,
@@ -13,7 +12,6 @@
 //     * Neither the name of Ayende Rahien nor the names of its
 //     contributors may be used to endorse or promote products derived from this
 //     software without specific prior written permission.
-// 
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 // ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 // WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -26,82 +24,123 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
 
-
 using System;
-using System.Linq.Expressions;
-using Rhino.Mocks.Interfaces;
-using System.Reflection;
 using System.Collections;
+using System.Linq.Expressions;
+using System.Reflection;
+using Mammock.Interfaces;
 
-namespace Rhino.Mocks.Impl
+namespace Mammock.Impl
 {
-	/// <summary>
-	/// Validate arguments for methods
-	/// </summary>
-	public static class Validate
-	{
-		/// <summary>
-		/// Validate that the passed argument is not null.
-		/// </summary>
-		/// <param name="obj">The object to validate</param>
-		/// <param name="name">The name of the argument</param>
-		/// <exception cref="ArgumentNullException">
-		/// If the obj is null, an ArgumentNullException with the passed name
-		/// is thrown.
-		/// </exception>
-		public static void IsNotNull(object obj, string name)
-		{
-			if (obj == null)
-				throw new ArgumentNullException(name);
-		}
+    /// <summary>
+    /// Validate arguments for methods
+    /// </summary>
+    public static class Validate
+    {
+        /// <summary>
+        /// Validate that the passed argument is not null.
+        /// </summary>
+        /// <param name="obj">
+        /// The object to validate
+        /// </param>
+        /// <param name="name">
+        /// The name of the argument
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// If the obj is null, an ArgumentNullException with the passed name
+        /// is thrown.
+        /// </exception>
+        public static void IsNotNull(object obj, string name)
+        {
+            if (obj == null)
+                throw new ArgumentNullException(name);
+        }
 
         /// <summary>
         /// Validates that the passed argument is not null
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="reference">The reference.</param>
+        /// <typeparam name="T">
+        /// </typeparam>
+        /// <param name="reference">
+        /// The reference.
+        /// </param>
         public static void IsNotNull<T>(Expression<Func<T>> reference)
         {
-            if (reference.Body.GetConstantValue<T>() == null) throw new ArgumentNullException(GetParameterName(reference));
+            if (reference.Body.GetConstantValue<T>() == null)
+                throw new ArgumentNullException(GetParameterName(reference));
         }
 
         /// <summary>
         /// Validates that the passed argument is not null
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="reference">The reference.</param>
-        /// <param name="message">The message.</param>
+        /// <typeparam name="T">
+        /// </typeparam>
+        /// <param name="reference">
+        /// The reference.
+        /// </param>
+        /// <param name="message">
+        /// The message.
+        /// </param>
         public static void IsNotNull<T>(Expression<Func<T>> reference, string message)
         {
-            if (reference.Body.GetConstantValue<T>() == null) throw new ArgumentNullException(GetParameterName(reference), message);
+            if (reference.Body.GetConstantValue<T>() == null)
+                throw new ArgumentNullException(GetParameterName(reference), message);
         }
 
-		/// <summary>
-		/// Validate that the arguments are equal.
-		/// </summary>
-		/// <param name="expectedArgs">Expected args.</param>
-		/// <param name="actualArgs">Actual Args.</param>
-		public static bool ArgsEqual(object[] expectedArgs, object[] actualArgs)
-		{
-			return RecursiveCollectionEqual(expectedArgs, actualArgs);
-		}
+        /// <summary>
+        /// Validate that the arguments are equal.
+        /// </summary>
+        /// <param name="expectedArgs">
+        /// Expected args.
+        /// </param>
+        /// <param name="actualArgs">
+        /// Actual Args.
+        /// </param>
+        /// <returns>
+        /// The args equal.
+        /// </returns>
+        public static bool ArgsEqual(object[] expectedArgs, object[] actualArgs)
+        {
+            return RecursiveCollectionEqual(expectedArgs, actualArgs);
+        }
 
-		/// <summary>
-		/// Validate that the two arguments are equals, including validation for
-		/// when the arguments are collections, in which case it will validate their values.
-		/// </summary>
-		public static bool AreEqual(object expectedArg, object actualArg)
-		{
-			return RecursiveCollectionEqual(new object[] { expectedArg }, new object[] { actualArg });
-		}
+        /// <summary>
+        /// Validate that the two arguments are equals, including validation for
+        /// when the arguments are collections, in which case it will validate their values.
+        /// </summary>
+        /// <param name="expectedArg">
+        /// The expected Arg.
+        /// </param>
+        /// <param name="actualArg">
+        /// The actual Arg.
+        /// </param>
+        /// <returns>
+        /// The are equal.
+        /// </returns>
+        public static bool AreEqual(object expectedArg, object actualArg)
+        {
+            return RecursiveCollectionEqual(new[] {expectedArg}, new[] {actualArg});
+        }
 
-		#region Implementation
+        #region Implementation
 
+        /// <summary>
+        /// The recursive collection equal.
+        /// </summary>
+        /// <param name="expectedArgs">
+        /// The expected args.
+        /// </param>
+        /// <param name="actualArgs">
+        /// The actual args.
+        /// </param>
+        /// <returns>
+        /// The recursive collection equal.
+        /// </returns>
         private static bool RecursiveCollectionEqual(ICollection expectedArgs, ICollection actualArgs)
         {
-            if(expectedArgs == null && actualArgs == null)
+            if (expectedArgs == null && actualArgs == null)
                 return true;
-            if(expectedArgs==null || actualArgs==null)
+            if (expectedArgs == null || actualArgs == null)
                 return false;
 
             if (expectedArgs.Count != actualArgs.Count)
@@ -110,7 +149,7 @@ namespace Rhino.Mocks.Impl
             IEnumerator expectedArgsEnumerator = expectedArgs.GetEnumerator();
             IEnumerator actualArgsEnumerator = actualArgs.GetEnumerator();
             while (expectedArgsEnumerator.MoveNext()
-                && actualArgsEnumerator.MoveNext())
+                   && actualArgsEnumerator.MoveNext())
             {
                 object expected = expectedArgsEnumerator.Current;
                 object actual = actualArgsEnumerator.Current;
@@ -133,8 +172,10 @@ namespace Rhino.Mocks.Impl
 
                     continue;
                 }
+
                 return false;
             }
+
             return true;
         }
 
@@ -142,45 +183,77 @@ namespace Rhino.Mocks.Impl
         /// This method is safe for use even if any of the objects is a mocked object
         /// that override equals.
         /// </summary>
+        /// <param name="expected">
+        /// The expected.
+        /// </param>
+        /// <param name="actual">
+        /// The actual.
+        /// </param>
+        /// <returns>
+        /// The safe equals.
+        /// </returns>
         private static bool SafeEquals(object expected, object actual)
         {
             IMockedObject expectedMock = expected as IMockedObject;
             IMockedObject actualMock = actual as IMockedObject;
-            //none are mocked object
+
+// none are mocked object
             if (expectedMock == null && actualMock == null)
             {
                 return expected.Equals(actual);
             }
-            //if any of them is a mocked object, use mocks equality
-            //this may not be what the user is expecting, but it is needed, because
-            //otherwise we get into endless loop.
-            return MockedObjectsEquality.Instance.Equals(expected,actual);
+
+// if any of them is a mocked object, use mocks equality
+            // this may not be what the user is expecting, but it is needed, because
+            // otherwise we get into endless loop.
+            return MockedObjectsEquality.Instance.Equals(expected, actual);
         }
 
+        /// <summary>
+        /// The get parameter name.
+        /// </summary>
+        /// <param name="reference">
+        /// The reference.
+        /// </param>
+        /// <returns>
+        /// The get parameter name.
+        /// </returns>
         private static string GetParameterName(Expression reference)
         {
-            var lambda = reference as LambdaExpression;
-            var member = lambda.Body as MemberExpression;
+            LambdaExpression lambda = reference as LambdaExpression;
+            MemberExpression member = lambda.Body as MemberExpression;
 
             return member.Member.Name;
         }
 
+        /// <summary>
+        /// The get constant value.
+        /// </summary>
+        /// <param name="expression">
+        /// The expression.
+        /// </param>
+        /// <typeparam name="T">
+        /// </typeparam>
+        /// <returns>
+        /// </returns>
         private static T GetConstantValue<T>(this Expression expression)
         {
             if (expression.NodeType == ExpressionType.Constant)
-                return (T)(((ConstantExpression)expression).Value);
+                return (T) ((ConstantExpression) expression).Value;
 
             if (expression.NodeType == ExpressionType.MemberAccess)
             {
-                var memberExpr = (MemberExpression)expression;
-                var memberInfo = memberExpr.Member as FieldInfo;
+                MemberExpression memberExpr = (MemberExpression) expression;
+                FieldInfo memberInfo = memberExpr.Member as FieldInfo;
                 if (memberInfo != null)
-                    return (T)memberInfo.GetValue(memberExpr.Expression.GetConstantValue<object>());
+                    return (T) memberInfo.GetValue(memberExpr.Expression.GetConstantValue<object>());
             }
 
-            return Expression.Lambda<Func<T>>(Expression.Convert(expression, typeof(T)), new ParameterExpression[0]).Compile()();
+            return
+                Expression.Lambda<Func<T>>(Expression.Convert(expression, typeof (T)), new ParameterExpression[0]).
+                    Compile()();
         }
 
-		#endregion
-	}
+        #endregion
+    }
 }

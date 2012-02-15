@@ -29,7 +29,7 @@
 using System;
 using Xunit;
 
-namespace Rhino.Mocks.Tests.RecordPlaybackSyntax
+namespace Mammock.Tests.RecordPlaybackSyntax
 {
 	
 	public class RecordPlaybackTests

@@ -31,9 +31,9 @@
 
 using System;
 using System.Reflection;
-using Rhino.Mocks.Interfaces;
+using Mammock.Interfaces;
 
-namespace Rhino.Mocks.Impl
+namespace Mammock.Impl
 {
 	/// <summary>
 	/// Behave like a stub, all properties and events acts normally, methods calls
@@ -158,9 +158,9 @@ namespace Rhino.Mocks.Impl
 
 using System;
 using System.Reflection;
-using Rhino.Mocks.Interfaces;
+using Mammock.Interfaces;
 
-namespace Rhino.Mocks.Impl
+namespace Mammock.Impl
 {
 	/// <summary>
 	/// Behave like a stub, all properties and events acts normally, methods calls

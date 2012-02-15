@@ -1,11 +1,12 @@
-namespace Rhino.Mocks.Tests
+using System;
+using Xunit;
+
+namespace Mammock.Tests
 {
-	using System;
-	using Xunit;
 
 	public class Throws
 	{
-		public static void Exception<TException>(Delegates.Action action)
+		public static void Exception<TException>(Mammock.Delegates.Action action)
 			where TException  : Exception
 		{
 			try
@@ -18,7 +19,7 @@ namespace Rhino.Mocks.Tests
 			}
 		}
 
-		public static void Exception<TException>(string message, Delegates.Action action)
+        public static void Exception<TException>(string message, Mammock.Delegates.Action action)
 			where TException : Exception
 		{
 			try

@@ -1,6 +1,6 @@
 using System;
 
-namespace Rhino.Mocks
+namespace Mammock
 {
     /// <summary>
     /// What should BackToRecord clear
@@ -11,23 +11,28 @@ namespace Rhino.Mocks
         /// <summary>
         /// Retain all expectations and behaviors and return to mock
         /// </summary>
-        None = 0,
+        None = 0, 
+
         /// <summary>
         /// All expectations
         /// </summary>
-        Expectations = 1,
+        Expectations = 1, 
+
         /// <summary>
         /// Event subscribers for this instance
         /// </summary>
-        EventSubscribers = 2,
+        EventSubscribers = 2, 
+
         /// <summary>
         /// Methods that should be forwarded to the base class implementation
         /// </summary>
-        OriginalMethodsToCall = 4,
+        OriginalMethodsToCall = 4, 
+
         /// <summary>
         /// Properties that should behave like properties
         /// </summary>
-        PropertyBehavior = 8,
+        PropertyBehavior = 8, 
+
         /// <summary>
         /// Remove all the behavior of the object
         /// </summary>

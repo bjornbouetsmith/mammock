@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Rhino.Mocks.Impl.RemotingMock
+namespace Mammock.Impl.RemotingMock
 {
     /// <summary>
     /// Operation on a remoting proxy
@@ -22,6 +18,12 @@ namespace Rhino.Mocks.Impl.RemotingMock
     /// </remarks>
     internal interface IRemotingProxyOperation
     {
+        /// <summary>
+        /// The process.
+        /// </summary>
+        /// <param name="proxy">
+        /// The proxy.
+        /// </param>
         void Process(RemotingProxy proxy);
     }
 }

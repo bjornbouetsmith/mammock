@@ -26,18 +26,13 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
 
-
 using System;
-using System.Data;
-using Xunit;
-using Rhino.Mocks;
-using Rhino.Mocks.Constraints;
-using Rhino.Mocks.Exceptions;
-using Rhino.Mocks.Impl;
-using Rhino.Mocks.Tests.Callbacks;
 using System.Collections.Generic;
+using Mammock.Constraints;
+using Mammock.Exceptions;
+using Xunit;
 
-namespace Rhino.Mocks.Tests
+namespace Mammock.Tests
 {
     // Interface to create mocks for
     public interface ITestInterface

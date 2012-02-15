@@ -31,7 +31,7 @@ using System;
 using System.Text;
 using Xunit;
 
-namespace Rhino.Mocks.Tests
+namespace Mammock.Tests
 {
     
     public class DoHanlderTests

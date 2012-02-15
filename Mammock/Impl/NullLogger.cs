@@ -1,47 +1,64 @@
-using System;
 using Castle.DynamicProxy;
-using Rhino.Mocks.Interfaces;
+using Mammock.Interfaces;
 
-namespace Rhino.Mocks.Impl
+namespace Mammock.Impl
 {
-	/// <summary>
-	/// Doesn't log anything, just makes happy noises
-	/// </summary>
-	public class NullLogger : IExpectationLogger
-	{
-	    /// <summary>
-	    /// Logs the message
-	    /// </summary>
-	    /// <param name="message">The message.</param>
-	    public void Log(string message)
-	    {
-	    }
+    /// <summary>
+    /// Doesn't log anything, just makes happy noises
+    /// </summary>
+    public class NullLogger : IExpectationLogger
+    {
+        #region IExpectationLogger Members
 
-	    /// <summary>
-		/// Logs the expectation as is was recorded
-		/// </summary>
-		/// <param name="invocation">The invocation.</param>
-		/// <param name="expectation">The expectation.</param>
-		public void LogRecordedExpectation(IInvocation invocation, IExpectation expectation)
-		{
-		}
+        /// <summary>
+        /// Logs the message
+        /// </summary>
+        /// <param name="message">
+        /// The message.
+        /// </param>
+        public void Log(string message)
+        {
+        }
 
-		/// <summary>
-		/// Logs the expectation as it was recorded
-		/// </summary>
-		/// <param name="invocation">The invocation.</param>
-		/// <param name="expectation">The expectation.</param>
-		public void LogReplayedExpectation(IInvocation invocation, IExpectation expectation)
-		{
-		}
+        /// <summary>
+        /// Logs the expectation as is was recorded
+        /// </summary>
+        /// <param name="invocation">
+        /// The invocation.
+        /// </param>
+        /// <param name="expectation">
+        /// The expectation.
+        /// </param>
+        public void LogRecordedExpectation(IInvocation invocation, IExpectation expectation)
+        {
+        }
 
-		/// <summary>
-		/// Logs the unexpected method call.
-		/// </summary>
-		/// <param name="invocation">The invocation.</param>
-		/// <param name="message">The message.</param>
-		public void LogUnexpectedMethodCall(IInvocation invocation, string message)
-		{
-		}
-	}
+        /// <summary>
+        /// Logs the expectation as it was recorded
+        /// </summary>
+        /// <param name="invocation">
+        /// The invocation.
+        /// </param>
+        /// <param name="expectation">
+        /// The expectation.
+        /// </param>
+        public void LogReplayedExpectation(IInvocation invocation, IExpectation expectation)
+        {
+        }
+
+        /// <summary>
+        /// Logs the unexpected method call.
+        /// </summary>
+        /// <param name="invocation">
+        /// The invocation.
+        /// </param>
+        /// <param name="message">
+        /// The message.
+        /// </param>
+        public void LogUnexpectedMethodCall(IInvocation invocation, string message)
+        {
+        }
+
+        #endregion
+    }
 }

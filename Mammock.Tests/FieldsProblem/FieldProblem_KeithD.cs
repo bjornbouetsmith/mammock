@@ -1,7 +1,7 @@
-﻿namespace Rhino.Mocks.Tests.FieldsProblem
+﻿namespace Mammock.Tests.FieldsProblem
 {
     using System;
-    using Rhino.Mocks.Interfaces;
+    using Mammock.Interfaces;
     using Xunit;
 
     public class FieldProblem_KeithD

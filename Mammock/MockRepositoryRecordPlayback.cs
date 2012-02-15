@@ -1,10 +1,9 @@
 #region license
+
 // Copyright (c) 2005 - 2007 Ayende Rahien (ayende@ayende.com)
 // All rights reserved.
-// 
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
-// 
 //     * Redistributions of source code must retain the above copyright notice,
 //     this list of conditions and the following disclaimer.
 //     * Redistributions in binary form must reproduce the above copyright notice,
@@ -13,7 +12,6 @@
 //     * Neither the name of Ayende Rahien nor the names of its
 //     contributors may be used to endorse or promote products derived from this
 //     software without specific prior written permission.
-// 
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 // ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 // WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -29,62 +27,110 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace Rhino.Mocks
+namespace Mammock
 {
-	internal class PlaybackModeChanger : IModeChanger
-	{
-		private readonly MockRepository m_repository;
+    /// <summary>
+    /// The playback mode changer.
+    /// </summary>
+    internal class PlaybackModeChanger : IModeChanger
+    {
+        /// <summary>
+        /// The m_repository.
+        /// </summary>
+        private readonly MockRepository m_repository;
 
-		public PlaybackModeChanger(MockRepository repository)
-		{
-			m_repository = repository;
-		}
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PlaybackModeChanger"/> class.
+        /// </summary>
+        /// <param name="repository">
+        /// The repository.
+        /// </param>
+        public PlaybackModeChanger(MockRepository repository)
+        {
+            m_repository = repository;
+        }
 
-		public void Dispose()
-		{
-			if (DisposableActionsHelper.ExceptionWasThrownAndDisposableActionShouldNotBeCalled())
-				return;
-			m_repository.VerifyAll();
-		}
-	}
+        #region IModeChanger Members
 
-	internal static class DisposableActionsHelper
-	{
-		internal static bool ExceptionWasThrownAndDisposableActionShouldNotBeCalled()
-		{
-			//If we're running under Mono, then we don't want to call Marshall.GetExceptionCode as it
-			// currently is not implemented
-			Type t = Type.GetType("Mono.Runtime");
-			if (t == null)
-			{
-				// Probably running the .NET Framework
-				if (Marshal.GetExceptionCode() != 0)
-				{
-					return true;
-				}
-			}
-			return false;
-		}
-	}
+        /// <summary>
+        /// The dispose.
+        /// </summary>
+        public void Dispose()
+        {
+            if (DisposableActionsHelper.ExceptionWasThrownAndDisposableActionShouldNotBeCalled())
+                return;
+            m_repository.VerifyAll();
+        }
 
-	internal class RecordModeChanger : IModeChanger
-	{
-		private readonly MockRepository m_repository;
+        #endregion
+    }
 
-		public RecordModeChanger(MockRepository repository)
-		{
-			m_repository = repository;
-		}
+    /// <summary>
+    /// The disposable actions helper.
+    /// </summary>
+    internal static class DisposableActionsHelper
+    {
+        /// <summary>
+        /// The exception was thrown and disposable action should not be called.
+        /// </summary>
+        /// <returns>
+        /// The exception was thrown and disposable action should not be called.
+        /// </returns>
+        internal static bool ExceptionWasThrownAndDisposableActionShouldNotBeCalled()
+        {
+            // If we're running under Mono, then we don't want to call Marshall.GetExceptionCode as it
+            // currently is not implemented
+            Type t = Type.GetType("Mono.Runtime");
+            if (t == null)
+            {
+                // Probably running the .NET Framework
+                if (Marshal.GetExceptionCode() != 0)
+                {
+                    return true;
+                }
+            }
 
-		public void Dispose()
-		{
-			if (DisposableActionsHelper.ExceptionWasThrownAndDisposableActionShouldNotBeCalled())
-				return;
-			m_repository.ReplayAll();
-		}
-	}
+            return false;
+        }
+    }
 
-    ///<summary>
+    /// <summary>
+    /// The record mode changer.
+    /// </summary>
+    internal class RecordModeChanger : IModeChanger
+    {
+        /// <summary>
+        /// The m_repository.
+        /// </summary>
+        private readonly MockRepository m_repository;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RecordModeChanger"/> class.
+        /// </summary>
+        /// <param name="repository">
+        /// The repository.
+        /// </param>
+        public RecordModeChanger(MockRepository repository)
+        {
+            m_repository = repository;
+        }
+
+        #region IModeChanger Members
+
+        /// <summary>
+        /// The dispose.
+        /// </summary>
+        public void Dispose()
+        {
+            if (DisposableActionsHelper.ExceptionWasThrownAndDisposableActionShouldNotBeCalled())
+                return;
+            m_repository.ReplayAll();
+        }
+
+        #endregion
+    }
+
+    /// <summary>
     /// Interface which allows for the optional usage:
     ///   using(mockRepository.Record()) {
     ///      Expect.Call(mock.Method()).Return(retVal);
@@ -94,9 +140,8 @@ namespace Rhino.Mocks
     ///   }
     /// N.B. mockRepository.ReplayAll() and mockRepository.VerifyAll()
     ///      calls are taken care of by Record/Playback
-    ///</summary>
+    /// </summary>
     public interface IModeChanger : IDisposable
     {
-        
     }
 }

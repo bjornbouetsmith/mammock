@@ -1,10 +1,9 @@
 ﻿#region license
+
 // Copyright (c) 2005 - 2007 Ayende Rahien (ayende@ayende.com)
 // All rights reserved.
-// 
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
-// 
 //     * Redistributions of source code must retain the above copyright notice,
 //     this list of conditions and the following disclaimer.
 //     * Redistributions in binary form must reproduce the above copyright notice,
@@ -13,7 +12,6 @@
 //     * Neither the name of Ayende Rahien nor the names of its
 //     contributors may be used to endorse or promote products derived from this
 //     software without specific prior written permission.
-// 
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 // ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 // WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -28,57 +26,73 @@
 
 using System.Reflection;
 using Castle.DynamicProxy;
-using Rhino.Mocks.Interfaces;
+using Mammock.Interfaces;
 
-namespace Rhino.Mocks.Impl
+namespace Mammock.Impl
 {
-	/// <summary>
-	/// Validate all expectations on a mock and ignores calls to
-	/// any method that was not setup properly.
-	/// </summary>
-	public class ReplayPartialMockState : ReplayMockState
-	{
-		/// <summary>
-		/// Creates a new <see cref="ReplayDynamicMockState"/> instance.
-		/// </summary>
-		/// <param name="previousState">The previous state for this method</param>
-		public ReplayPartialMockState(RecordPartialMockState previousState)
-			: base(previousState)
-		{
-		}
+    /// <summary>
+    /// Validate all expectations on a mock and ignores calls to
+    /// any method that was not setup properly.
+    /// </summary>
+    public class ReplayPartialMockState : ReplayMockState
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ReplayPartialMockState"/> class. 
+        /// Creates a new <see cref="ReplayDynamicMockState"/> instance.
+        /// </summary>
+        /// <param name="previousState">
+        /// The previous state for this method
+        /// </param>
+        public ReplayPartialMockState(RecordPartialMockState previousState)
+            : base(previousState)
+        {
+        }
 
-		/// <summary>
-		/// Add a method call for this state' mock.
-		/// </summary>
-		/// <param name="invocation">The invocation for this method</param>
-		/// <param name="method">The method that was called</param>
-		/// <param name="args">The arguments this method was called with</param>
-		protected override object DoMethodCall(IInvocation invocation, MethodInfo method, params object[] args)
-		{
-			IExpectation expectation = repository.Replayer.GetRecordedExpectationOrNull(proxy, method, args);
-			if (expectation != null)
-			{
-				RhinoMocks.Logger.LogReplayedExpectation(invocation, expectation);
-				return expectation.ReturnOrThrow(invocation,args);
-			}
-		    if (method.IsAbstract == false)
-		    {
-		        RhinoMocks.Logger.LogUnexpectedMethodCall(invocation, "Partial mock: calling original method");
-		        invocation.Proceed();
-		        return invocation.ReturnValue;
-		    }
-		    RhinoMocks.Logger.LogUnexpectedMethodCall(invocation, "Partial mock: abstract method called but was not expected");
-		    //because the expectation doesn't exist, an exception will be thrown
-		    return repository.Replayer.GetRecordedExpectation(invocation,proxy, method, args);
-		}
+        /// <summary>
+        /// Add a method call for this state' mock.
+        /// </summary>
+        /// <param name="invocation">
+        /// The invocation for this method
+        /// </param>
+        /// <param name="method">
+        /// The method that was called
+        /// </param>
+        /// <param name="args">
+        /// The arguments this method was called with
+        /// </param>
+        /// <returns>
+        /// The do method call.
+        /// </returns>
+        protected override object DoMethodCall(IInvocation invocation, MethodInfo method, params object[] args)
+        {
+            IExpectation expectation = repository.Replayer.GetRecordedExpectationOrNull(proxy, method, args);
+            if (expectation != null)
+            {
+                RhinoMocks.Logger.LogReplayedExpectation(invocation, expectation);
+                return expectation.ReturnOrThrow(invocation, args);
+            }
+
+            if (method.IsAbstract == false)
+            {
+                RhinoMocks.Logger.LogUnexpectedMethodCall(invocation, "Partial mock: calling original method");
+                invocation.Proceed();
+                return invocation.ReturnValue;
+            }
+
+            RhinoMocks.Logger.LogUnexpectedMethodCall(invocation, 
+                                                      "Partial mock: abstract method called but was not expected");
+
+// because the expectation doesn't exist, an exception will be thrown
+            return repository.Replayer.GetRecordedExpectation(invocation, proxy, method, args);
+        }
 
 
-		/// <summary>
-		/// Gets a mock state that match the original mock state of the object.
-		/// </summary>
-		public override IMockState BackToRecord()
-		{
-			return new RecordPartialMockState(proxy, repository);
-		}
-	}
+        /// <summary>
+        /// Gets a mock state that match the original mock state of the object.
+        /// </summary>
+        public override IMockState BackToRecord()
+        {
+            return new RecordPartialMockState(proxy, repository);
+        }
+    }
 }

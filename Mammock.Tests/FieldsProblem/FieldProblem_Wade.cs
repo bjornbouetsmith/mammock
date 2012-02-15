@@ -30,7 +30,7 @@
 using System.Runtime.InteropServices;
 using Xunit;
 
-namespace Rhino.Mocks.Tests.FieldsProblem
+namespace Mammock.Tests.FieldsProblem
 {
 	
 	public class FieldProblem_Wade

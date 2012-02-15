@@ -1,13 +1,18 @@
 using Castle.DynamicProxy;
 
-namespace Rhino.Mocks.Interfaces
+namespace Mammock.Interfaces
 {
-    ///<summary>
-    ///</summary>
+    /// <summary>
+    /// The i invocation actionn.
+    /// </summary>
     public interface IInvocationActionn
     {
-        ///<summary>
-        ///</summary>
+        /// <summary>
+        /// The perform against.
+        /// </summary>
+        /// <param name="invocation">
+        /// The invocation.
+        /// </param>
         void PerformAgainst(IInvocation invocation);
     }
 }

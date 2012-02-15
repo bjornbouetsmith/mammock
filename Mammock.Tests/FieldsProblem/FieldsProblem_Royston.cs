@@ -26,16 +26,11 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
 
-
-using System;
-using System.Text;
-
 using Xunit;
-using Rhino.Mocks;
 
-namespace Rhino.Mocks.Tests.FieldsProblem
+namespace Mammock.Tests.FieldsProblem
 {
-    
+
     public class FieldsProblem_Royston
     {
         private MockRepository mMocks;

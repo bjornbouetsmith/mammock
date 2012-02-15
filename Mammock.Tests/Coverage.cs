@@ -33,15 +33,15 @@ using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using Xunit;
-using Rhino.Mocks.Constraints;
-using Rhino.Mocks.Exceptions;
-using Rhino.Mocks.Expectations;
-using Rhino.Mocks.Impl;
-using Rhino.Mocks.Interfaces;
-using Rhino.Mocks.Tests.Expectations;
-using Rhino.Mocks.Utilities;
+using Mammock.Constraints;
+using Mammock.Exceptions;
+using Mammock.Expectations;
+using Mammock.Impl;
+using Mammock.Interfaces;
+using Mammock.Tests.Expectations;
+using Mammock.Utilities;
 
-namespace Rhino.Mocks.Tests
+namespace Mammock.Tests
 {
 	/// <summary>
 	/// Tests needed to get full coverage

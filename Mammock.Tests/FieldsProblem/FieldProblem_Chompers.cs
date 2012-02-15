@@ -4,7 +4,7 @@ using System.Text;
 using Xunit;
 using System.IO;
 
-namespace Rhino.Mocks.Tests.FieldsProblem
+namespace Mammock.Tests.FieldsProblem
 {
 	
 	public class FieldProblem_Chompers

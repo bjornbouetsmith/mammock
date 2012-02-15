@@ -1,10 +1,9 @@
 ﻿#region license
+
 // Copyright (c) 2005 - 2007 Ayende Rahien (ayende@ayende.com)
 // All rights reserved.
-// 
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
-// 
 //     * Redistributions of source code must retain the above copyright notice,
 //     this list of conditions and the following disclaimer.
 //     * Redistributions in binary form must reproduce the above copyright notice,
@@ -13,7 +12,6 @@
 //     * Neither the name of Ayende Rahien nor the names of its
 //     contributors may be used to endorse or promote products derived from this
 //     software without specific prior written permission.
-// 
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 // ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 // WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -26,39 +24,51 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
 
-
 using System;
 using System.Runtime.Serialization;
 
-namespace Rhino.Mocks.Exceptions
+namespace Mammock.Exceptions
 {
-	/*
+/*
 	 * Class: ExpectationViolationException
 	 * This exception is thrown when there is a an expectation violation.
-	 */ 
-	/// <summary>
-	/// An expectaton violation was detected.
-	/// </summary>
-	[Serializable()]
-	public class ExpectationViolationException : Exception
-	{
-		#region Constructors
+	 */
 
-		/// <summary>
-		/// Creates a new <see cref="ExpectationViolationException"/> instance.
-		/// </summary>
-		/// <param name="message">Message.</param>
-		public ExpectationViolationException(string message) : base(message)
-		{
-		}
-		
-		
-		/// <summary>
-		/// Serialization constructor
-		/// </summary>
-		protected ExpectationViolationException(SerializationInfo info, StreamingContext context)
-        :base(info,context){} 
+    /// <summary>
+    /// An expectaton violation was detected.
+    /// </summary>
+    [Serializable]
+    public class ExpectationViolationException : Exception
+    {
+        #region Constructors
 
-		#endregion
-	}
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ExpectationViolationException"/> class. 
+        /// Creates a new <see cref="ExpectationViolationException"/> instance.
+        /// </summary>
+        /// <param name="message">
+        /// Message.
+        /// </param>
+        public ExpectationViolationException(string message) : base(message)
+        {
+        }
+
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ExpectationViolationException"/> class. 
+        /// Serialization constructor
+        /// </summary>
+        /// <param name="info">
+        /// The info.
+        /// </param>
+        /// <param name="context">
+        /// The context.
+        /// </param>
+        protected ExpectationViolationException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        {
+        }
+
+        #endregion
+    }
 }

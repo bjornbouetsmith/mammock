@@ -1,10 +1,9 @@
 ﻿#region license
+
 // Copyright (c) 2005 - 2007 Ayende Rahien (ayende@ayende.com)
 // All rights reserved.
-// 
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
-// 
 //     * Redistributions of source code must retain the above copyright notice,
 //     this list of conditions and the following disclaimer.
 //     * Redistributions in binary form must reproduce the above copyright notice,
@@ -13,7 +12,6 @@
 //     * Neither the name of Ayende Rahien nor the names of its
 //     contributors may be used to endorse or promote products derived from this
 //     software without specific prior written permission.
-// 
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 // ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 // WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -26,18 +24,17 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
 
+using Mammock.Impl;
+using Mammock.Interfaces;
 
-using Rhino.Mocks.Impl;
-using Rhino.Mocks.Interfaces;
-
-namespace Rhino.Mocks
+namespace Mammock
 {
-	/// <summary>
-	/// Setup method calls to repeat any number of times.
-	/// </summary>
-	public static class SetupResult
-	{
-		/*
+    /// <summary>
+    /// Setup method calls to repeat any number of times.
+    /// </summary>
+    public static class SetupResult
+    {
+        /*
 		 * Method: For
 		 * Sets the last method call to repeat any number of times and return the method options 
 		 * for the last method call, which usually will be a method call
@@ -55,18 +52,24 @@ namespace Rhino.Mocks
 		 * If you need to record in a multi threading environment, use the <On> method, which _can_
 		 * handle multi threading scenarios.
 		 * 
-		 */ 
-		/// <summary>
-		/// Get the method options and set the last method call to repeat 
-		/// any number of times.
-		/// This also means that the method would transcend ordering
-		/// </summary>
-		public static IMethodOptions<T> For<T>(T ignored)
-		{
-			return LastCall.GetOptions<T>().Repeat.Any();
-		}
+		 */
 
-		/*
+        /// <summary>
+        /// Get the method options and set the last method call to repeat 
+        /// any number of times.
+        /// This also means that the method would transcend ordering
+        /// </summary>
+        /// <typeparam name="T">
+        /// </typeparam>
+        /// <param name="ignored">
+        /// The ignored.
+        /// </param>
+        public static IMethodOptions<T> For<T>(T ignored)
+        {
+            return LastCall.GetOptions<T>().Repeat.Any();
+        }
+
+        /*
 		 * Method: On
 		 * Sets the last method call to repeat any number of times and return the method options 
 		 * for the last method call on the mockInstance.
@@ -79,15 +82,19 @@ namespace Rhino.Mocks
 		 * Thread safety:
 		 * This method can be used in mutli threading scenarios.
 		 */
-		/// <summary>
-		/// Get the method options for the last method call on the mockInstance and set it
-		/// to repeat any number of times.
-		/// This also means that the method would transcend ordering
-		/// </summary>
-		public static ICreateMethodExpectation On(object mockedInstace)
-		{
-			IMockedObject mockedObject = MockRepository.GetMockedObject(mockedInstace);
-			return new CreateMethodExpectationForSetupResult(mockedObject, mockedInstace);
-		}
-	}
+
+        /// <summary>
+        /// Get the method options for the last method call on the mockInstance and set it
+        /// to repeat any number of times.
+        /// This also means that the method would transcend ordering
+        /// </summary>
+        /// <param name="mockedInstace">
+        /// The mocked Instace.
+        /// </param>
+        public static ICreateMethodExpectation On(object mockedInstace)
+        {
+            IMockedObject mockedObject = MockRepository.GetMockedObject(mockedInstace);
+            return new CreateMethodExpectationForSetupResult(mockedObject, mockedInstace);
+        }
+    }
 }

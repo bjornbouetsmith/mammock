@@ -1,11 +1,10 @@
 using System;
 using Castle.DynamicProxy;
-using Rhino.Mocks.Interfaces;
-using Rhino.Mocks.Utilities;
+using Mammock.Interfaces;
+using Mammock.Utilities;
 
-namespace Rhino.Mocks.Impl
+namespace Mammock.Impl
 {
-
     /// <summary>
     /// Write rhino mocks log info to the console
     /// </summary>
@@ -16,7 +15,9 @@ namespace Rhino.Mocks.Impl
         /// <summary>
         /// Logs the message
         /// </summary>
-        /// <param name="message">The message.</param>
+        /// <param name="message">
+        /// The message.
+        /// </param>
         public void Log(string message)
         {
             Console.WriteLine(message);
@@ -25,8 +26,12 @@ namespace Rhino.Mocks.Impl
         /// <summary>
         /// Logs the expectation as is was recorded
         /// </summary>
-        /// <param name="invocation">The invocation.</param>
-        /// <param name="expectation">The expectation.</param>
+        /// <param name="invocation">
+        /// The invocation.
+        /// </param>
+        /// <param name="expectation">
+        /// The expectation.
+        /// </param>
         public void LogRecordedExpectation(IInvocation invocation, IExpectation expectation)
         {
             string methodCall = MethodCallUtil.StringPresentation(invocation, invocation.Method, invocation.Arguments);
@@ -36,8 +41,12 @@ namespace Rhino.Mocks.Impl
         /// <summary>
         /// Logs the expectation as it was recorded
         /// </summary>
-        /// <param name="invocation">The invocation.</param>
-        /// <param name="expectation">The expectation.</param>
+        /// <param name="invocation">
+        /// The invocation.
+        /// </param>
+        /// <param name="expectation">
+        /// The expectation.
+        /// </param>
         public void LogReplayedExpectation(IInvocation invocation, IExpectation expectation)
         {
             string methodCall = MethodCallUtil.StringPresentation(invocation, invocation.Method, invocation.Arguments);
@@ -47,8 +56,12 @@ namespace Rhino.Mocks.Impl
         /// <summary>
         /// Logs the unexpected method call.
         /// </summary>
-        /// <param name="invocation">The invocation.</param>
-        /// <param name="message">The message.</param>
+        /// <param name="invocation">
+        /// The invocation.
+        /// </param>
+        /// <param name="message">
+        /// The message.
+        /// </param>
         public void LogUnexpectedMethodCall(IInvocation invocation, string message)
         {
             string methodCall = MethodCallUtil.StringPresentation(invocation, invocation.Method, invocation.Arguments);

@@ -28,7 +28,7 @@ using System.Reflection.Emit;
 using System.Text;
 using System.Threading;
 using Castle.DynamicProxy;
-using Rhino.Mocks.Interfaces;
+using Mammock.Interfaces;
 using Xunit;
 
 namespace Mammock.Tests.Delegates

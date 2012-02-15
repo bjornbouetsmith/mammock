@@ -257,7 +257,6 @@
     <Compile Include="SetupResultTests.cs" />
     <Compile Include="StubAllTest.cs" />
     <Compile Include="StubTest.cs" />
-    <Compile Include="TestInfo.cs" />
     <Compile Include="Throws.cs" />
     <Compile Include="TraceWriterWithStackTraceExpectationWriterFixture.cs" />
     <Compile Include="UsingComObject.cs" />

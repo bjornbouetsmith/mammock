@@ -1,10 +1,9 @@
 #region license
+
 // Copyright (c) 2005 - 2007 Ayende Rahien (ayende@ayende.com)
 // All rights reserved.
-// 
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
-// 
 //     * Redistributions of source code must retain the above copyright notice,
 //     this list of conditions and the following disclaimer.
 //     * Redistributions in binary form must reproduce the above copyright notice,
@@ -13,7 +12,6 @@
 //     * Neither the name of Ayende Rahien nor the names of its
 //     contributors may be used to endorse or promote products derived from this
 //     software without specific prior written permission.
-// 
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 // ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 // WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -28,39 +26,52 @@
 
 using Castle.DynamicProxy;
 
-namespace Rhino.Mocks.Interfaces
+namespace Mammock.Interfaces
 {
-	/// <summary>
-	/// Log expectations - allows to see what is going on inside Rhino Mocks
-	/// </summary>
-	public interface IExpectationLogger
-	{
+    /// <summary>
+    /// Log expectations - allows to see what is going on inside Rhino Mocks
+    /// </summary>
+    public interface IExpectationLogger
+    {
+        /// <summary>
+        /// Logs the message
+        /// </summary>
+        /// <param name="message">
+        /// The message.
+        /// </param>
+        void Log(string message);
 
-	    /// <summary>
-	    /// Logs the message
-	    /// </summary>
-	    /// <param name="message">The message.</param>
-	    void Log(string message);
+        /// <summary>
+        /// Logs the expectation as is was recorded
+        /// </summary>
+        /// <param name="invocation">
+        /// The invocation.
+        /// </param>
+        /// <param name="expectation">
+        /// The expectation.
+        /// </param>
+        void LogRecordedExpectation(IInvocation invocation, IExpectation expectation);
 
-		/// <summary>
-		/// Logs the expectation as is was recorded
-		/// </summary>
-		/// <param name="invocation">The invocation.</param>
-		/// <param name="expectation">The expectation.</param>
-		void LogRecordedExpectation(IInvocation invocation, IExpectation expectation);
+        /// <summary>
+        /// Logs the expectation as it was recorded
+        /// </summary>
+        /// <param name="invocation">
+        /// The invocation.
+        /// </param>
+        /// <param name="expectation">
+        /// The expectation.
+        /// </param>
+        void LogReplayedExpectation(IInvocation invocation, IExpectation expectation);
 
-		/// <summary>
-		/// Logs the expectation as it was recorded
-		/// </summary>
-		/// <param name="invocation">The invocation.</param>
-		/// <param name="expectation">The expectation.</param>
-		void LogReplayedExpectation(IInvocation invocation, IExpectation expectation);
-
-		/// <summary>
-		/// Logs the unexpected method call.
-		/// </summary>
-		/// <param name="invocation">The invocation.</param>
-		/// <param name="message">The message.</param>
-		void LogUnexpectedMethodCall(IInvocation invocation, string message);
-	}
+        /// <summary>
+        /// Logs the unexpected method call.
+        /// </summary>
+        /// <param name="invocation">
+        /// The invocation.
+        /// </param>
+        /// <param name="message">
+        /// The message.
+        /// </param>
+        void LogUnexpectedMethodCall(IInvocation invocation, string message);
+    }
 }

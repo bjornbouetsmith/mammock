@@ -1,7 +1,7 @@
 
 using Xunit;
 
-namespace Rhino.Mocks.Tests
+namespace Mammock.Tests
 {
 	using System;
 	using Exceptions;

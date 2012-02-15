@@ -30,13 +30,13 @@
 using System;
 using System.Reflection;
 using Xunit;
-using Rhino.Mocks.Exceptions;
-using Rhino.Mocks.Impl;
-using Rhino.Mocks.Tests.Expectations;
-using Rhino.Mocks.Tests.Utilities;
+using Mammock.Exceptions;
+using Mammock.Impl;
+using Mammock.Tests.Expectations;
+using Mammock.Tests.Utilities;
 using Castle.DynamicProxy;
 
-namespace Rhino.Mocks.Tests.Impl
+namespace Mammock.Tests.Impl
 {
 	
 	public class ReplayMockStateTests

@@ -1,6 +1,7 @@
 ﻿using NUnit.Framework;
+using Mammock;
 
-namespace Rhino.Mocks.GettingStarted
+namespace Mammock.GettingStarted
 {
     [TestFixture]
     public class Stubs

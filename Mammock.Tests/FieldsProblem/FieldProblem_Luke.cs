@@ -33,7 +33,7 @@ using Xunit;
 using MSHTML;
 using Assert = Xunit.Assert;
 
-namespace Rhino.Mocks.Tests.FieldsProblem
+namespace Mammock.Tests.FieldsProblem
 {
 
     public class FieldProblem_Luke

@@ -3,7 +3,7 @@ using System;
 using System.ComponentModel;
 using Xunit;
 
-namespace Rhino.Mocks.Tests.FieldsProblem
+namespace Mammock.Tests.FieldsProblem
 {
     
     public class FieldProblem_Adam

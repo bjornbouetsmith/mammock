@@ -29,7 +29,7 @@
 
 using Xunit;
 
-namespace Rhino.Mocks.Tests
+namespace Mammock.Tests
 {
 	
 	public class IndexerTests

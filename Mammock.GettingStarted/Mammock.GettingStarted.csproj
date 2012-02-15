@@ -8,8 +8,8 @@
     <ProjectGuid>{59F8A3E2-80C5-4250-909A-16741DF81B23}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>EmptyClassProject</RootNamespace>
-    <AssemblyName>EmptyClassProject</AssemblyName>
+    <RootNamespace>Mammock.GettingStarted</RootNamespace>
+    <AssemblyName>Mammock.GettingStarted</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

@@ -1,7 +1,7 @@
 using System;
 using Xunit;
 
-namespace Rhino.Mocks.Tests.FieldsProblem.FieldProblem_Nolan2
+namespace Mammock.Tests.FieldsProblem.FieldProblem_Nolan2
 {
     public interface IDemo
     {

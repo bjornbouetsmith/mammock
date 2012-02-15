@@ -1,26 +1,43 @@
 using Castle.DynamicProxy;
-using Rhino.Mocks.Interfaces;
+using Mammock.Interfaces;
 
-namespace Rhino.Mocks.Impl.Invocation.Actions
+namespace Mammock.Impl.Invocation.Actions
 {
-    ///<summary>
-    ///</summary>
+    /// <summary>
+    /// The handle event.
+    /// </summary>
     public class HandleEvent : IInvocationActionn
     {
-        IMockedObject proxyInstance;
+        /// <summary>
+        /// The proxy instance.
+        /// </summary>
+        private readonly IMockedObject proxyInstance;
 
-        ///<summary>
-        ///</summary>
+        /// <summary>
+        /// Initializes a new instance of the <see cref="HandleEvent"/> class. 
+        /// The handle event.
+        /// </summary>
+        /// <param name="proxy_instance">
+        /// The proxy_instance.
+        /// </param>
         public HandleEvent(IMockedObject proxy_instance)
         {
             proxyInstance = proxy_instance;
         }
 
-        ///<summary>
-        ///</summary>
+        #region IInvocationActionn Members
+
+        /// <summary>
+        /// The perform against.
+        /// </summary>
+        /// <param name="invocation">
+        /// The invocation.
+        /// </param>
         public void PerformAgainst(IInvocation invocation)
         {
             proxyInstance.HandleEvent(invocation.Method, invocation.Arguments);
         }
+
+        #endregion
     }
 }

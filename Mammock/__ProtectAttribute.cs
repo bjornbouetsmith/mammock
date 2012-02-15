@@ -9,5 +9,4 @@ using System;
 [CLSCompliant(false)]
 public class __ProtectAttribute : Attribute
 {
-    
 }

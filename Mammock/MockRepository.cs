@@ -2,10 +2,8 @@
 
 // Copyright (c) 2005 - 2007 Ayende Rahien (ayende@ayende.com)
 // All rights reserved.
-// 
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
-// 
 //     * Redistributions of source code must retain the above copyright notice,
 //     this list of conditions and the following disclaimer.
 //     * Redistributions in binary form must reproduce the above copyright notice,
@@ -14,7 +12,6 @@
 //     * Neither the name of Ayende Rahien nor the names of its
 //     contributors may be used to endorse or promote products derived from this
 //     software without specific prior written permission.
-// 
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 // ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 // WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -25,7 +22,6 @@
 // CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
 #endregion
 
 using System;
@@ -37,17 +33,17 @@ using System.Reflection.Emit;
 using System.Text;
 using Castle.DynamicProxy;
 using Castle.DynamicProxy.Internal;
-using Rhino.Mocks.Exceptions;
-using Rhino.Mocks.Generated;
-using Rhino.Mocks.Impl;
-using Rhino.Mocks.Impl.Invocation;
-using Rhino.Mocks.Impl.RemotingMock;
-using Rhino.Mocks.Interfaces;
-using Rhino.Mocks.MethodRecorders;
+using Mammock.Exceptions;
+using Mammock.Generated;
+using Mammock.Impl;
+using Mammock.Impl.Invocation;
+using Mammock.Impl.RemotingMock;
+using Mammock.Interfaces;
+using Mammock.MethodRecorders;
 
-namespace Rhino.Mocks
+namespace Mammock
 {
-    /*
+/*
      * class: MockRepository
      * The MockRepository is the main interaction point with Rhino Mocks.
      * 
@@ -111,11 +107,317 @@ namespace Rhino.Mocks
     public class MockRepository
     {
         /// <summary>
-        ///  Delegate: CreateMockState
+        /// Creates a mock for the spesified type with strict mocking semantics.
+        /// <para>
+        /// Strict semantics means that any call that wasn't explicitly recorded is considered an error and would cause an exception to be thrown.
+        /// </para>
+        /// </summary>
+        /// <typeparam name="T">
+        /// </typeparam>
+        /// <param name="argumentsForConstructor">
+        /// Arguments for the class' constructor, if mocking a concrete class
+        /// </param>
+        [Obsolete("Use StrictMock instead")]
+        public T CreateMock<T>(params object[] argumentsForConstructor)
+        {
+            return StrictMock<T>(argumentsForConstructor);
+        }
+
+        /// <summary>
+        /// Creates a mock for the spesified type with strict mocking semantics.
+        /// <para>
+        /// Strict semantics means that any call that wasn't explicitly recorded is considered an error and would cause an exception to be thrown.
+        /// </para>
+        /// </summary>
+        /// <typeparam name="T">
+        /// </typeparam>
+        /// <param name="argumentsForConstructor">
+        /// Arguments for the class' constructor, if mocking a concrete class
+        /// </param>
+        public T StrictMock<T>(params object[] argumentsForConstructor)
+        {
+            if (ShouldUseRemotingProxy(typeof (T), argumentsForConstructor))
+                return (T) RemotingMock(typeof (T), CreateRecordState);
+            return (T) CreateMockObject(typeof (T), CreateRecordState, new Type[0], argumentsForConstructor);
+        }
+
+        /// <summary>
+        /// The should use remoting proxy.
+        /// </summary>
+        /// <param name="type">
+        /// The type.
+        /// </param>
+        /// <param name="argumentsForConstructor">
+        /// The arguments for constructor.
+        /// </param>
+        /// <returns>
+        /// The should use remoting proxy.
+        /// </returns>
+        private static bool ShouldUseRemotingProxy(Type type, object[] argumentsForConstructor)
+        {
+            return typeof (MarshalByRefObject).IsAssignableFrom(type) &&
+                   (argumentsForConstructor == null || argumentsForConstructor.Length == 0);
+        }
+
+        /*
+         * Method: DynamicMock<T>
+         * Create a mock object of type T with dynamic semantics.
+         * Dynamic semantics means that any call that wasn't explicitly recorded is accepted and a
+         * null or zero is returned (if there is a return value).
+         */
+
+        /// <summary>
+        /// Creates a dynamic mock for the specified type.
+        /// </summary>
+        /// <typeparam name="T">
+        /// </typeparam>
+        /// <param name="argumentsForConstructor">
+        /// Arguments for the class' constructor, if mocking a concrete class
+        /// </param>
+        public T DynamicMock<T>(params object[] argumentsForConstructor)
+            where T : class
+        {
+            if (ShouldUseRemotingProxy(typeof (T), argumentsForConstructor))
+                return (T) RemotingMock(typeof (T), CreateDynamicRecordState);
+            return (T) CreateMockObject(typeof (T), CreateDynamicRecordState, new Type[0], argumentsForConstructor);
+        }
+
+        /// <summary>
+        /// Creates a mock object from several types.
+        /// </summary>
+        /// <typeparam name="T">
+        /// </typeparam>
+        /// <param name="extraTypes">
+        /// The extra Types.
+        /// </param>
+        [Obsolete("Use StrictMultiMock instead")]
+        public T CreateMultiMock<T>(params Type[] extraTypes)
+        {
+            return StrictMultiMock<T>(extraTypes);
+        }
+
+        /// <summary>
+        /// Creates a strict mock object from several types.
+        /// </summary>
+        /// <typeparam name="T">
+        /// </typeparam>
+        /// <param name="extraTypes">
+        /// The extra Types.
+        /// </param>
+        public T StrictMultiMock<T>(params Type[] extraTypes)
+        {
+            return (T) StrictMultiMock(typeof (T), extraTypes);
+        }
+
+        /// <summary>
+        /// Create a mock object from several types with dynamic semantics.
+        /// </summary>
+        /// <typeparam name="T">
+        /// </typeparam>
+        /// <param name="extraTypes">
+        /// The extra Types.
+        /// </param>
+        public T DynamicMultiMock<T>(params Type[] extraTypes)
+        {
+            return (T) DynamicMultiMock(typeof (T), extraTypes);
+        }
+
+        /// <summary>
+        /// Create a mock object from several types with partial semantics.
+        /// </summary>
+        /// <typeparam name="T">
+        /// </typeparam>
+        /// <param name="extraTypes">
+        /// The extra Types.
+        /// </param>
+        public T PartialMultiMock<T>(params Type[] extraTypes)
+        {
+            return (T) PartialMultiMock(typeof (T), extraTypes);
+        }
+
+        /// <summary>
+        /// Create a mock object from several types with strict semantics.
+        /// </summary>
+        /// <typeparam name="T">
+        /// </typeparam>
+        /// <param name="extraTypes">
+        /// Extra interface types to mock.
+        /// </param>
+        /// <param name="argumentsForConstructor">
+        /// Arguments for the class' constructor, if mocking a concrete class
+        /// </param>
+        [Obsolete("Use StrictMultiMock instead")]
+        public T CreateMultiMock<T>(Type[] extraTypes, params object[] argumentsForConstructor)
+        {
+            return StrictMultiMock<T>(extraTypes, argumentsForConstructor);
+        }
+
+
+        /// <summary>
+        /// Create a strict mock object from several types with strict semantics.
+        /// </summary>
+        /// <typeparam name="T">
+        /// </typeparam>
+        /// <param name="extraTypes">
+        /// Extra interface types to mock.
+        /// </param>
+        /// <param name="argumentsForConstructor">
+        /// Arguments for the class' constructor, if mocking a concrete class
+        /// </param>
+        public T StrictMultiMock<T>(Type[] extraTypes, params object[] argumentsForConstructor)
+        {
+            return (T) StrictMultiMock(typeof (T), extraTypes, argumentsForConstructor);
+        }
+
+        /// <summary>
+        /// Create a mock object from several types with dynamic semantics.
+        /// </summary>
+        /// <typeparam name="T">
+        /// </typeparam>
+        /// <param name="extraTypes">
+        /// Extra interface types to mock.
+        /// </param>
+        /// <param name="argumentsForConstructor">
+        /// Arguments for the class' constructor, if mocking a concrete class
+        /// </param>
+        public T DynamicMultiMock<T>(Type[] extraTypes, params object[] argumentsForConstructor)
+        {
+            return (T) DynamicMultiMock(typeof (T), extraTypes, argumentsForConstructor);
+        }
+
+        /// <summary>
+        /// Create a mock object from several types with partial semantics.
+        /// </summary>
+        /// <typeparam name="T">
+        /// </typeparam>
+        /// <param name="extraTypes">
+        /// Extra interface types to mock.
+        /// </param>
+        /// <param name="argumentsForConstructor">
+        /// Arguments for the class' constructor, if mocking a concrete class
+        /// </param>
+        public T PartialMultiMock<T>(Type[] extraTypes, params object[] argumentsForConstructor)
+        {
+            return (T) PartialMultiMock(typeof (T), extraTypes, argumentsForConstructor);
+        }
+
+        /*
+         * Method: PartialMock
+         * Create a mock object with from a class that defaults to calling the class methods
+         * if no expectation is set on the method.
+         * 
+         */
+
+        /// <summary>
+        /// Create a mock object with from a class that defaults to calling the class methods
+        /// </summary>
+        /// <typeparam name="T">
+        /// </typeparam>
+        /// <param name="argumentsForConstructor">
+        /// Arguments for the class' constructor, if mocking a concrete class
+        /// </param>
+        public T PartialMock<T>(params object[] argumentsForConstructor) where T : class
+        {
+            return (T) PartialMock(typeof (T), argumentsForConstructor);
+        }
+
+        /// <summary>
+        /// Create a stub object, one that has properties and events ready for use, and 
+        /// can have methods called on it. It requires an explicit step in order to create 
+        /// an expectation for a stub.
+        /// </summary>
+        /// <typeparam name="T">
+        /// </typeparam>
+        /// <param name="argumentsForConstructor">
+        /// The arguments for constructor.
+        /// </param>
+        public T Stub<T>(params object[] argumentsForConstructor)
+        {
+            return (T) Stub(typeof (T), argumentsForConstructor);
+        }
+
+        /// <summary>
+        /// Create a stub object, one that has properties and events ready for use, and
+        /// can have methods called on it. It requires an explicit step in order to create
+        /// an expectation for a stub.
+        /// </summary>
+        /// <param name="type">
+        /// The type.
+        /// </param>
+        /// <param name="argumentsForConstructor">
+        /// The arguments for constructor.
+        /// </param>
+        /// <returns>
+        /// The stub
+        /// </returns>
+        public object Stub(Type type, params object[] argumentsForConstructor)
+        {
+            CreateMockState createStub = mockedObject => new StubRecordMockState(mockedObject, this);
+            if (ShouldUseRemotingProxy(type, argumentsForConstructor))
+                return RemotingMock(type, createStub);
+            return CreateMockObject(type, createStub, new Type[0], argumentsForConstructor);
+        }
+
+        /// <summary>
+        /// Returns true if the passed mock is currently in replay mode.
+        /// </summary>
+        /// <param name="mock">
+        /// The mock to test.
+        /// </param>
+        /// <returns>
+        /// True if the mock is in replay mode, false otherwise.
+        /// </returns>
+        public bool IsInReplayMode(object mock)
+        {
+            if (mock == null)
+                throw new ArgumentNullException("mock");
+
+            if (proxies.ContainsKey(mock))
+            {
+                return proxies[mock] is ReplayMockState;
+            }
+
+            throw new ArgumentException(mock + " is not a mock.", "mock");
+        }
+
+        /// <summary>
+        /// Determines whether the specified proxy is a stub.
+        /// </summary>
+        /// <param name="proxy">
+        /// The proxy.
+        /// </param>
+        /// <returns>
+        /// The is stub.
+        /// </returns>
+        protected internal static bool IsStub(object proxy)
+        {
+            MockRepository repository = GetMockedObject(proxy).Repository;
+            IMockState mockState = repository.proxies[proxy];
+            return mockState is StubRecordMockState || mockState is StubReplayMockState;
+        }
+
+        /// <summary>
+        /// Register a call on a prperty behavior 
+        /// </summary>
+        /// <param name="instance">
+        /// </param>
+        protected internal void RegisterPropertyBehaviorOn(IMockedObject instance)
+        {
+            lastRepository = this;
+            lastMockedObject = instance;
+            proxies[instance].NotifyCallOnPropertyBehavior();
+        }
+
+        #region Nested type: CreateMockState
+
+        /// <summary>
+        /// Delegate: CreateMockState
         ///  This is used internally to cleanly handle the creation of different 
         ///  RecordMockStates.
         /// </summary>
         protected delegate IMockState CreateMockState(IMockedObject mockedObject);
+
+        #endregion
 
         #region Variables
 
@@ -128,8 +430,7 @@ namespace Rhino.Mocks
         /// <summary>
         /// This is a map of types to ProxyGenerators.
         /// </summary>
-        [ThreadStatic]
-        private static IDictionary<Type, ProxyGenerator> generatorMap;
+        [ThreadStatic] private static IDictionary<Type, ProxyGenerator> generatorMap;
 
         /*
          * Variable: lastRepository
@@ -141,8 +442,7 @@ namespace Rhino.Mocks
         /// <summary>
         /// This is used to record the last repository that has a method called on it.
         /// </summary>
-        [ThreadStatic]
-        internal static MockRepository lastRepository;
+        [ThreadStatic] internal static MockRepository lastRepository;
 
         /*
          * Var: lastProxy
@@ -150,26 +450,21 @@ namespace Rhino.Mocks
          */
 
         /// <summary>
-        /// this is used to get to the last proxy on this repository.
+        /// The delegate target interface creator.
         /// </summary>
-        internal IMockedObject lastMockedObject;
-
         private static readonly DelegateTargetInterfaceCreator delegateTargetInterfaceCreator =
             new DelegateTargetInterfaceCreator();
 
         /// <summary>
-        /// For mock delegates, maps the proxy instance from intercepted invocations
-        /// back to the delegate that was originally returned to client code, if any.
+        /// The invocation visitors factory.
         /// </summary>
-        protected IDictionary delegateProxies;
+        private readonly InvocationVisitorsFactory invocationVisitorsFactory;
 
         /// <summary>
-        /// All the proxies in the mock repositories
+        /// The recorders.
         /// </summary>
-        protected ProxyStateDictionary proxies;
-
         private readonly Stack recorders;
-        private readonly IMethodRecorder rootRecorder;
+
         /// <summary>
         /// This is here because we can't put it in any of the recorders, since repeatable methods
         /// have no orderring, and if we try to handle them using the usual manner, we would get into
@@ -178,8 +473,31 @@ namespace Rhino.Mocks
         /// </summary>
         private readonly ProxyMethodExpectationsDictionary repeatableMethods;
 
+        /// <summary>
+        /// The root recorder.
+        /// </summary>
+        private readonly IMethodRecorder rootRecorder;
+
+        /// <summary>
+        /// For mock delegates, maps the proxy instance from intercepted invocations
+        /// back to the delegate that was originally returned to client code, if any.
+        /// </summary>
+        protected IDictionary delegateProxies;
+
+        /// <summary>
+        /// this is used to get to the last proxy on this repository.
+        /// </summary>
+        internal IMockedObject lastMockedObject;
+
+        /// <summary>
+        /// All the proxies in the mock repositories
+        /// </summary>
+        protected ProxyStateDictionary proxies;
+
+        /// <summary>
+        /// The proxy generation options.
+        /// </summary>
         private ProxyGenerationOptions proxyGenerationOptions;
-        private InvocationVisitorsFactory invocationVisitorsFactory;
 
         #endregion
 
@@ -208,6 +526,7 @@ namespace Rhino.Mocks
          */
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="MockRepository"/> class. 
         /// Creates a new <see cref="MockRepository"/> instance.
         /// </summary>
         public MockRepository()
@@ -217,12 +536,14 @@ namespace Rhino.Mocks
                 generatorMap = new Dictionary<Type, ProxyGenerator>();
             }
 
-            CustomAttributeBuilder builder = AttributeUtil.CreateBuilder(typeof(__ProtectAttribute), new object[] { });
+            CustomAttributeBuilder builder = AttributeUtil.CreateBuilder(typeof (__ProtectAttribute), new object[] {});
 
             proxyGenerationOptions = new ProxyGenerationOptions
-            {
-                AdditionalAttributes = { builder }
-            };
+                                         {
+                                             AdditionalAttributes = {
+                                                                       builder
+                                                                    }
+                                         };
             recorders = new Stack();
             repeatableMethods = new ProxyMethodExpectationsDictionary();
             rootRecorder = new UnorderedMethodRecorder(repeatableMethods);
@@ -235,7 +556,6 @@ namespace Rhino.Mocks
             // to another.
             ArgManager.Clear();
         }
-
 
         #endregion
 
@@ -334,8 +654,15 @@ namespace Rhino.Mocks
         /// <summary>
         /// Creates a mock for the specified type.
         /// </summary>
-        /// <param name="type">Type.</param>
-        /// <param name="argumentsForConstructor">Arguments for the class' constructor, if mocking a concrete class</param>
+        /// <param name="type">
+        /// Type.
+        /// </param>
+        /// <param name="argumentsForConstructor">
+        /// Arguments for the class' constructor, if mocking a concrete class
+        /// </param>
+        /// <returns>
+        /// The create mock.
+        /// </returns>
         [Obsolete("Use StrictMock instead")]
         public object CreateMock(Type type, params object[] argumentsForConstructor)
         {
@@ -345,8 +672,15 @@ namespace Rhino.Mocks
         /// <summary>
         /// Creates a strict mock for the specified type.
         /// </summary>
-        /// <param name="type">Type.</param>
-        /// <param name="argumentsForConstructor">Arguments for the class' constructor, if mocking a concrete class</param>
+        /// <param name="type">
+        /// Type.
+        /// </param>
+        /// <param name="argumentsForConstructor">
+        /// Arguments for the class' constructor, if mocking a concrete class
+        /// </param>
+        /// <returns>
+        /// The strict mock.
+        /// </returns>
         public object StrictMock(Type type, params object[] argumentsForConstructor)
         {
             if (ShouldUseRemotingProxy(type, argumentsForConstructor))
@@ -357,8 +691,15 @@ namespace Rhino.Mocks
         /// <summary>
         /// Creates a remoting mock for the specified type.
         /// </summary>
-        /// <param name="type">Type.</param>
-        /// <param name="argumentsForConstructor">Arguments for the class' constructor, if mocking a concrete class</param>
+        /// <param name="type">
+        /// Type.
+        /// </param>
+        /// <param name="argumentsForConstructor">
+        /// Arguments for the class' constructor, if mocking a concrete class
+        /// </param>
+        /// <returns>
+        /// The create mock with remoting.
+        /// </returns>
         [Obsolete("Use StrictMockWithRemoting instead")]
         public object CreateMockWithRemoting(Type type, params object[] argumentsForConstructor)
         {
@@ -368,8 +709,15 @@ namespace Rhino.Mocks
         /// <summary>
         /// Creates a strict remoting mock for the specified type.
         /// </summary>
-        /// <param name="type">Type.</param>
-        /// <param name="argumentsForConstructor">Arguments for the class' constructor, if mocking a concrete class</param>
+        /// <param name="type">
+        /// Type.
+        /// </param>
+        /// <param name="argumentsForConstructor">
+        /// Arguments for the class' constructor, if mocking a concrete class
+        /// </param>
+        /// <returns>
+        /// The strict mock with remoting.
+        /// </returns>
         public object StrictMockWithRemoting(Type type, params object[] argumentsForConstructor)
         {
             return RemotingMock(type, CreateRecordState);
@@ -378,9 +726,13 @@ namespace Rhino.Mocks
         /// <summary>
         /// Creates a remoting mock for the specified type.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="argumentsForConstructor">Arguments for the class' constructor, if mocking a concrete class</param>
-        /// <returns></returns>
+        /// <typeparam name="T">
+        /// </typeparam>
+        /// <param name="argumentsForConstructor">
+        /// Arguments for the class' constructor, if mocking a concrete class
+        /// </param>
+        /// <returns>
+        /// </returns>
         [Obsolete("Use StrictMockWithRemoting instead")]
         public T CreateMockWithRemoting<T>(params object[] argumentsForConstructor)
         {
@@ -390,18 +742,31 @@ namespace Rhino.Mocks
         /// <summary>
         /// Creates a strict remoting mock for the specified type.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="argumentsForConstructor">Arguments for the class' constructor, if mocking a concrete class</param>
-        /// <returns></returns>
+        /// <typeparam name="T">
+        /// </typeparam>
+        /// <param name="argumentsForConstructor">
+        /// Arguments for the class' constructor, if mocking a concrete class
+        /// </param>
+        /// <returns>
+        /// </returns>
         public T StrictMockWithRemoting<T>(params object[] argumentsForConstructor)
         {
-            return (T)RemotingMock(typeof(T), CreateRecordState);
+            return (T) RemotingMock(typeof (T), CreateRecordState);
         }
 
         /// <summary>
         /// Creates a mock from several types, with strict semantics.
         /// Only <paramref name="mainType"/> may be a class.
         /// </summary>
+        /// <param name="mainType">
+        /// The main Type.
+        /// </param>
+        /// <param name="extraTypes">
+        /// The extra Types.
+        /// </param>
+        /// <returns>
+        /// The create multi mock.
+        /// </returns>
         [Obsolete("Use StrictMultiMock instead")]
         public object CreateMultiMock(Type mainType, params Type[] extraTypes)
         {
@@ -412,6 +777,15 @@ namespace Rhino.Mocks
         /// Creates a strict mock from several types, with strict semantics.
         /// Only <paramref name="mainType"/> may be a class.
         /// </summary>
+        /// <param name="mainType">
+        /// The main Type.
+        /// </param>
+        /// <param name="extraTypes">
+        /// The extra Types.
+        /// </param>
+        /// <returns>
+        /// The strict multi mock.
+        /// </returns>
         public object StrictMultiMock(Type mainType, params Type[] extraTypes)
         {
             return StrictMultiMock(mainType, extraTypes, new object[0]);
@@ -421,9 +795,18 @@ namespace Rhino.Mocks
         /// Creates a mock from several types, with strict semantics.
         /// Only <paramref name="mainType"/> may be a class.
         /// </summary>
-        /// <param name="mainType">The main type to mock.</param>
-        /// <param name="extraTypes">Extra interface types to mock.</param>
-        /// <param name="argumentsForConstructor">Arguments for the class' constructor, if mocking a concrete class.</param>
+        /// <param name="mainType">
+        /// The main type to mock.
+        /// </param>
+        /// <param name="extraTypes">
+        /// Extra interface types to mock.
+        /// </param>
+        /// <param name="argumentsForConstructor">
+        /// Arguments for the class' constructor, if mocking a concrete class.
+        /// </param>
+        /// <returns>
+        /// The create multi mock.
+        /// </returns>
         [Obsolete("Use StrictMultiMock instead")]
         public object CreateMultiMock(Type mainType, Type[] extraTypes, params object[] argumentsForConstructor)
         {
@@ -434,9 +817,18 @@ namespace Rhino.Mocks
         /// Creates a strict mock from several types, with strict semantics.
         /// Only <paramref name="mainType"/> may be a class.
         /// </summary>
-        /// <param name="mainType">The main type to mock.</param>
-        /// <param name="extraTypes">Extra interface types to mock.</param>
-        /// <param name="argumentsForConstructor">Arguments for the class' constructor, if mocking a concrete class.</param>
+        /// <param name="mainType">
+        /// The main type to mock.
+        /// </param>
+        /// <param name="extraTypes">
+        /// Extra interface types to mock.
+        /// </param>
+        /// <param name="argumentsForConstructor">
+        /// Arguments for the class' constructor, if mocking a concrete class.
+        /// </param>
+        /// <returns>
+        /// The strict multi mock.
+        /// </returns>
         public object StrictMultiMock(Type mainType, Type[] extraTypes, params object[] argumentsForConstructor)
         {
             if (argumentsForConstructor == null) argumentsForConstructor = new object[0];
@@ -447,8 +839,15 @@ namespace Rhino.Mocks
         /// Creates a mock from several types, with dynamic semantics.
         /// Only <paramref name="mainType"/> may be a class.
         /// </summary>
-        /// <param name="mainType">The main type to mock.</param>
-        /// <param name="extraTypes">Extra interface types to mock.</param>
+        /// <param name="mainType">
+        /// The main type to mock.
+        /// </param>
+        /// <param name="extraTypes">
+        /// Extra interface types to mock.
+        /// </param>
+        /// <returns>
+        /// The dynamic multi mock.
+        /// </returns>
         public object DynamicMultiMock(Type mainType, params Type[] extraTypes)
         {
             return DynamicMultiMock(mainType, extraTypes, new object[0]);
@@ -458,9 +857,18 @@ namespace Rhino.Mocks
         /// Creates a mock from several types, with dynamic semantics.
         /// Only <paramref name="mainType"/> may be a class.
         /// </summary>
-        /// <param name="mainType">The main type to mock.</param>
-        /// <param name="extraTypes">Extra interface types to mock.</param>
-        /// <param name="argumentsForConstructor">Arguments for the class' constructor, if mocking a concrete class.</param>
+        /// <param name="mainType">
+        /// The main type to mock.
+        /// </param>
+        /// <param name="extraTypes">
+        /// Extra interface types to mock.
+        /// </param>
+        /// <param name="argumentsForConstructor">
+        /// Arguments for the class' constructor, if mocking a concrete class.
+        /// </param>
+        /// <returns>
+        /// The dynamic multi mock.
+        /// </returns>
         public object DynamicMultiMock(Type mainType, Type[] extraTypes, params object[] argumentsForConstructor)
         {
             return CreateMockObject(mainType, CreateDynamicRecordState, extraTypes, argumentsForConstructor);
@@ -473,9 +881,18 @@ namespace Rhino.Mocks
          * null or zero is returned (if there is a return value).
          */
 
-        /// <summary>Creates a dynamic mock for the specified type.</summary>
-        /// <param name="type">Type.</param>
-        /// <param name="argumentsForConstructor">Arguments for the class' constructor, if mocking a concrete class</param>
+        /// <summary>
+        /// Creates a dynamic mock for the specified type.
+        /// </summary>
+        /// <param name="type">
+        /// Type.
+        /// </param>
+        /// <param name="argumentsForConstructor">
+        /// Arguments for the class' constructor, if mocking a concrete class
+        /// </param>
+        /// <returns>
+        /// The dynamic mock.
+        /// </returns>
         public object DynamicMock(Type type, params object[] argumentsForConstructor)
         {
             if (ShouldUseRemotingProxy(type, argumentsForConstructor))
@@ -483,61 +900,118 @@ namespace Rhino.Mocks
             return DynamicMultiMock(type, new Type[0], argumentsForConstructor);
         }
 
-        /// <summary>Creates a dynamic mock for the specified type.</summary>
-        /// <param name="type">Type.</param>
-        /// <param name="argumentsForConstructor">Arguments for the class' constructor, if mocking a concrete class</param>
+        /// <summary>
+        /// Creates a dynamic mock for the specified type.
+        /// </summary>
+        /// <param name="type">
+        /// Type.
+        /// </param>
+        /// <param name="argumentsForConstructor">
+        /// Arguments for the class' constructor, if mocking a concrete class
+        /// </param>
+        /// <returns>
+        /// The dynamic mock with remoting.
+        /// </returns>
         public object DynamicMockWithRemoting(Type type, params object[] argumentsForConstructor)
         {
             return RemotingMock(type, CreateDynamicRecordState);
         }
 
-        /// <summary>Creates a dynamic mock for the specified type.</summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="argumentsForConstructor">Arguments for the class' constructor, if mocking a concrete class</param>
-        /// <returns></returns>
+        /// <summary>
+        /// Creates a dynamic mock for the specified type.
+        /// </summary>
+        /// <typeparam name="T">
+        /// </typeparam>
+        /// <param name="argumentsForConstructor">
+        /// Arguments for the class' constructor, if mocking a concrete class
+        /// </param>
+        /// <returns>
+        /// </returns>
         public T DynamicMockWithRemoting<T>(params object[] argumentsForConstructor)
         {
-            return (T)RemotingMock(typeof(T), CreateDynamicRecordState);
+            return (T) RemotingMock(typeof (T), CreateDynamicRecordState);
         }
 
-        /// <summary>Creates a mock object that defaults to calling the class methods if no expectation is set on the method.</summary>
-        /// <param name="type">Type.</param>
-        /// <param name="argumentsForConstructor">Arguments for the class' constructor.</param>
+        /// <summary>
+        /// Creates a mock object that defaults to calling the class methods if no expectation is set on the method.
+        /// </summary>
+        /// <param name="type">
+        /// Type.
+        /// </param>
+        /// <param name="argumentsForConstructor">
+        /// Arguments for the class' constructor.
+        /// </param>
+        /// <returns>
+        /// The partial mock.
+        /// </returns>
         public object PartialMock(Type type, params object[] argumentsForConstructor)
         {
             return PartialMultiMock(type, new Type[0], argumentsForConstructor);
         }
 
-        /// <summary>Creates a mock object that defaults to calling the class methods.</summary>
-        /// <param name="type">Type.</param>
-        /// <param name="extraTypes">Extra interface types to mock.</param>
+        /// <summary>
+        /// Creates a mock object that defaults to calling the class methods.
+        /// </summary>
+        /// <param name="type">
+        /// Type.
+        /// </param>
+        /// <param name="extraTypes">
+        /// Extra interface types to mock.
+        /// </param>
+        /// <returns>
+        /// The partial multi mock.
+        /// </returns>
         public object PartialMultiMock(Type type, params Type[] extraTypes)
         {
             return PartialMultiMock(type, extraTypes, new object[0]);
         }
 
-        /// <summary>Creates a mock object that defaults to calling the class methods.</summary>
-        /// <param name="type">Type.</param>
-        /// <param name="extraTypes">Extra interface types to mock.</param>
-        /// <param name="argumentsForConstructor">Arguments for the class' constructor.</param>
+        /// <summary>
+        /// Creates a mock object that defaults to calling the class methods.
+        /// </summary>
+        /// <param name="type">
+        /// Type.
+        /// </param>
+        /// <param name="extraTypes">
+        /// Extra interface types to mock.
+        /// </param>
+        /// <param name="argumentsForConstructor">
+        /// Arguments for the class' constructor.
+        /// </param>
+        /// <returns>
+        /// The partial multi mock.
+        /// </returns>
         public object PartialMultiMock(Type type, Type[] extraTypes, params object[] argumentsForConstructor)
         {
             if (type.IsInterface)
                 throw new InvalidOperationException("Can't create a partial mock from an interface");
             List<Type> extraTypesWithMarker = new List<Type>(extraTypes);
-            extraTypesWithMarker.Add(typeof(IPartialMockMarker));
-            return CreateMockObject(type, CreatePartialRecordState, extraTypesWithMarker.ToArray(), argumentsForConstructor);
+            extraTypesWithMarker.Add(typeof (IPartialMockMarker));
+            return CreateMockObject(type, CreatePartialRecordState, extraTypesWithMarker.ToArray(), 
+                                    argumentsForConstructor);
         }
 
-        /// <summary>Creates a mock object using remoting proxies</summary>
-        /// <param name="type">Type to mock - must be MarshalByRefObject</param>
-        /// <returns>Mock object</returns>
-        /// <remarks>Proxy mock can mock non-virtual methods, but not static methods</remarks>
-        /// <param name="factory">Creates the mock state for this proxy</param>
+        /// <summary>
+        /// Creates a mock object using remoting proxies
+        /// </summary>
+        /// <param name="type">
+        /// Type to mock - must be MarshalByRefObject
+        /// </param>
+        /// <param name="factory">
+        /// Creates the mock state for this proxy
+        /// </param>
+        /// <returns>
+        /// Mock object
+        /// </returns>
+        /// <remarks>
+        /// Proxy mock can mock non-virtual methods, but not static methods
+        /// </remarks>
         private object RemotingMock(Type type, CreateMockState factory)
         {
             ProxyInstance rhinoProxy = new ProxyInstance(this, type);
-            RhinoInterceptor interceptor = new RhinoInterceptor(this, rhinoProxy, invocationVisitorsFactory.CreateStandardInvocationVisitors(rhinoProxy, this));
+            RhinoInterceptor interceptor = new RhinoInterceptor(this, rhinoProxy, 
+                                                                invocationVisitorsFactory.
+                                                                    CreateStandardInvocationVisitors(rhinoProxy, this));
             object transparentProxy = new RemotingMockGenerator().CreateRemotingMock(type, interceptor, rhinoProxy);
             IMockState value = factory(rhinoProxy);
             proxies.Add(transparentProxy, value);
@@ -548,8 +1022,12 @@ namespace Rhino.Mocks
         /// Cause the mock state to change to replay, any further call is compared to the 
         /// ones that were called in the record state.
         /// </summary>
-        /// <remarks>This method *cannot* be called from inside an ordering.</remarks>
-        /// <param name="obj">the object to move to replay state</param>
+        /// <remarks>
+        /// This method *cannot* be called from inside an ordering.
+        /// </remarks>
+        /// <param name="obj">
+        /// the object to move to replay state
+        /// </param>
         public void Replay(object obj)
         {
             ReplayCore(obj, true);
@@ -559,8 +1037,11 @@ namespace Rhino.Mocks
         /// Cause the mock state to change to replay, any further call is compared to the 
         /// ones that were called in the record state.
         /// </summary>
-        /// <param name="obj">the object to move to replay state</param>
-        /// <param name="checkInsideOrdering"></param>
+        /// <param name="obj">
+        /// the object to move to replay state
+        /// </param>
+        /// <param name="checkInsideOrdering">
+        /// </param>
         protected internal void ReplayCore(object obj, bool checkInsideOrdering)
         {
             if (checkInsideOrdering)
@@ -576,8 +1057,18 @@ namespace Rhino.Mocks
             }
         }
 
-        /// <summary>Move the mocked object back to record state.<para>You can (and it's recommended) to run {Verify()} before you use this method.</para></summary>
-        /// <remarks>Will delete all current expectations!</remarks>
+        /// <summary>
+        /// Move the mocked object back to record state.
+        /// <para>
+        /// You can (and it's recommended) to run {Verify()} before you use this method.
+        /// </para>
+        /// </summary>
+        /// <param name="obj">
+        /// The obj.
+        /// </param>
+        /// <remarks>
+        /// Will delete all current expectations!
+        /// </remarks>
         public void BackToRecord(object obj)
         {
             BackToRecord(obj, BackToRecordOptions.All);
@@ -588,6 +1079,12 @@ namespace Rhino.Mocks
         /// Optionally, can delete all current expectations, but allows more granularity about how
         /// it would behave with regard to the object state.
         /// </summary>
+        /// <param name="obj">
+        /// The obj.
+        /// </param>
+        /// <param name="options">
+        /// The options.
+        /// </param>
         public void BackToRecord(object obj, BackToRecordOptions options)
         {
             IsMockObjectFromThisRepository(obj);
@@ -598,6 +1095,7 @@ namespace Rhino.Mocks
                 {
                     rootRecorder.RemoveExpectation(expectation);
                 }
+
                 rootRecorder.RemoveAllRepeatableExpectationsForProxy(obj);
             }
 
@@ -620,7 +1118,9 @@ namespace Rhino.Mocks
         /// <summary>
         /// Verify that all the expectations for this object were fulfilled.
         /// </summary>
-        /// <param name="obj">the object to verify the expectations for</param>
+        /// <param name="obj">
+        /// the object to verify the expectations for
+        /// </param>
         public void Verify(object obj)
         {
             IsMockObjectFromThisRepository(obj);
@@ -634,8 +1134,8 @@ namespace Rhino.Mocks
             }
             finally
             {
-                //This is needed because there might be an exception in verifying
-                //and I still need the mock state to move to verified.
+                // This is needed because there might be an exception in verifying
+                // and I still need the mock state to move to verified.
                 proxies[obj] = proxies[obj].VerifyState;
             }
         }
@@ -649,8 +1149,14 @@ namespace Rhino.Mocks
         /// Get the method options for the last call on
         /// mockedInstance.
         /// </summary>
-        /// <param name="mockedInstance">The mock object</param>
-        /// <returns>Method options for the last call</returns>
+        /// <typeparam name="T">
+        /// </typeparam>
+        /// <param name="mockedInstance">
+        /// The mock object
+        /// </param>
+        /// <returns>
+        /// Method options for the last call
+        /// </returns>
         internal IMethodOptions<T> LastMethodCall<T>(object mockedInstance)
         {
             object mock = GetMockObjectFromInvocationProxy(mockedInstance);
@@ -667,23 +1173,43 @@ namespace Rhino.Mocks
          * Handles a method call for a mock object.
          */
 
+        /// <summary>
+        /// The method call.
+        /// </summary>
+        /// <param name="invocation">
+        /// The invocation.
+        /// </param>
+        /// <param name="proxy">
+        /// The proxy.
+        /// </param>
+        /// <param name="method">
+        /// The method.
+        /// </param>
+        /// <param name="args">
+        /// The args.
+        /// </param>
+        /// <returns>
+        /// The method call.
+        /// </returns>
         internal object MethodCall(IInvocation invocation, object proxy, MethodInfo method, object[] args)
         {
-            //This can happen only if a vritual method call originated from 
-            //the constructor, before Rhino Mocks knows about the existance 
-            //of this proxy. Those type of calls will be ignored and not count
-            //as expectations, since there is not way to relate them to the 
-            //proper state.
+            // This can happen only if a vritual method call originated from 
+            // the constructor, before Rhino Mocks knows about the existance 
+            // of this proxy. Those type of calls will be ignored and not count
+            // as expectations, since there is not way to relate them to the 
+            // proper state.
             if (proxies.ContainsKey(proxy) == false)
             {
-                //We allow calls to virtual methods from the ctor only for partial mocks.
+                // We allow calls to virtual methods from the ctor only for partial mocks.
                 if (proxy is IPartialMockMarker)
                 {
                     invocation.Proceed();
                     return invocation.ReturnValue;
                 }
+
                 return null;
             }
+
             IMockState state = proxies[proxy];
             GetMockedObject(proxy).MethodCall(method, args);
             return state.MethodCall(invocation, method, args);
@@ -693,8 +1219,12 @@ namespace Rhino.Mocks
         /// Maps an invocation proxy back to the mock object instance that was originally
         /// returned to client code which might have been a delegate to this proxy.
         /// </summary>
-        /// <param name="invocationProxy">The mock object proxy from the intercepted invocation</param>
-        /// <returns>The mock object</returns>
+        /// <param name="invocationProxy">
+        /// The mock object proxy from the intercepted invocation
+        /// </param>
+        /// <returns>
+        /// The mock object
+        /// </returns>
         internal object GetMockObjectFromInvocationProxy(object invocationProxy)
         {
             object proxy = delegateProxies[invocationProxy];
@@ -702,21 +1232,50 @@ namespace Rhino.Mocks
             return invocationProxy;
         }
 
+        /// <summary>
+        /// The create record state.
+        /// </summary>
+        /// <param name="mockedObject">
+        /// The mocked object.
+        /// </param>
+        /// <returns>
+        /// </returns>
         private IMockState CreateRecordState(IMockedObject mockedObject)
         {
             return new RecordMockState(mockedObject, this);
         }
 
+        /// <summary>
+        /// The create dynamic record state.
+        /// </summary>
+        /// <param name="mockedObject">
+        /// The mocked object.
+        /// </param>
+        /// <returns>
+        /// </returns>
         private IMockState CreateDynamicRecordState(IMockedObject mockedObject)
         {
             return new RecordDynamicMockState(mockedObject, this);
         }
 
+        /// <summary>
+        /// The create partial record state.
+        /// </summary>
+        /// <param name="mockedObject">
+        /// The mocked object.
+        /// </param>
+        /// <returns>
+        /// </returns>
         private IMockState CreatePartialRecordState(IMockedObject mockedObject)
         {
             return new RecordPartialMockState(mockedObject, this);
         }
 
+        /// <summary>
+        /// The not inside orderring.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">
+        /// </exception>
         private void NotInsideOrderring()
         {
             if (Recorder != rootRecorder)
@@ -724,13 +1283,44 @@ namespace Rhino.Mocks
                     "Can't start replaying because Ordered or Unordered properties were call and not yet disposed.");
         }
 
+        /// <summary>
+        /// The clear last proxy.
+        /// </summary>
+        /// <param name="obj">
+        /// The obj.
+        /// </param>
         private void ClearLastProxy(object obj)
         {
             if (GetMockedObjectOrNull(obj) == lastMockedObject)
                 lastMockedObject = null;
         }
 
-        private object MockClass(CreateMockState mockStateFactory, Type type, Type[] extras, object[] argumentsForConstructor)
+        /// <summary>
+        /// The mock class.
+        /// </summary>
+        /// <param name="mockStateFactory">
+        /// The mock state factory.
+        /// </param>
+        /// <param name="type">
+        /// The type.
+        /// </param>
+        /// <param name="extras">
+        /// The extras.
+        /// </param>
+        /// <param name="argumentsForConstructor">
+        /// The arguments for constructor.
+        /// </param>
+        /// <returns>
+        /// The mock class.
+        /// </returns>
+        /// <exception cref="NotSupportedException">
+        /// </exception>
+        /// <exception cref="MissingMethodException">
+        /// </exception>
+        /// <exception cref="Exception">
+        /// </exception>
+        private object MockClass(CreateMockState mockStateFactory, Type type, Type[] extras, 
+                                 object[] argumentsForConstructor)
         {
             if (type.IsSealed)
             {
@@ -739,17 +1329,23 @@ namespace Rhino.Mocks
 
             List<Type> implementedTypesForGenericInvocationDiscoverability = new List<Type>(extras);
             implementedTypesForGenericInvocationDiscoverability.Add(type);
-            ProxyInstance proxyInstance = new ProxyInstance(this, implementedTypesForGenericInvocationDiscoverability.ToArray());
-            RhinoInterceptor interceptor = new RhinoInterceptor(this, proxyInstance, invocationVisitorsFactory.CreateStandardInvocationVisitors(proxyInstance, this));
+            ProxyInstance proxyInstance = new ProxyInstance(this, 
+                                                            implementedTypesForGenericInvocationDiscoverability.ToArray());
+            RhinoInterceptor interceptor = new RhinoInterceptor(this, proxyInstance, 
+                                                                invocationVisitorsFactory.
+                                                                    CreateStandardInvocationVisitors(proxyInstance, this));
             ArrayList types = new ArrayList();
             types.AddRange(extras);
-            types.Add(typeof(IMockedObject));
+            types.Add(typeof (IMockedObject));
             object proxy;
             try
             {
-                Castle.DynamicProxy.Generators.AttributesToAvoidReplicating.Add(typeof(System.Security.Permissions.UIPermissionAttribute));
+                Castle.DynamicProxy.Generators.AttributesToAvoidReplicating.Add(
+                    typeof (System.Security.Permissions.UIPermissionAttribute));
                 proxyGenerationOptions = ProxyGenerationOptions.Default;
-                proxy = GetProxyGenerator(type).CreateClassProxy(type, (Type[])types.ToArray(typeof(Type)), proxyGenerationOptions, argumentsForConstructor, interceptor);
+                proxy = GetProxyGenerator(type).CreateClassProxy(type, (Type[]) types.ToArray(typeof (Type)), 
+                                                                 proxyGenerationOptions, argumentsForConstructor, 
+                                                                 interceptor);
             }
             catch (MissingMethodException mme)
             {
@@ -759,50 +1355,86 @@ namespace Rhino.Mocks
             {
                 throw new Exception("Exception in constructor: " + tie.InnerException, tie.InnerException);
             }
-            IMockedObject mockedObject = (IMockedObject)proxy;
+
+            IMockedObject mockedObject = (IMockedObject) proxy;
             mockedObject.ConstructorArguments = argumentsForConstructor;
             IMockState value = mockStateFactory(mockedObject);
             proxies.Add(proxy, value);
-            GC.SuppressFinalize(proxy);//avoid issues with expectations created/validated on the finalizer thread
+            GC.SuppressFinalize(proxy); // avoid issues with expectations created/validated on the finalizer thread
             return proxy;
         }
 
+        /// <summary>
+        /// The mock interface.
+        /// </summary>
+        /// <param name="mockStateFactory">
+        /// The mock state factory.
+        /// </param>
+        /// <param name="type">
+        /// The type.
+        /// </param>
+        /// <param name="extras">
+        /// The extras.
+        /// </param>
+        /// <returns>
+        /// The mock interface.
+        /// </returns>
         private object MockInterface(CreateMockState mockStateFactory, Type type, Type[] extras)
         {
             object proxy;
             List<Type> implementedTypesForGenericInvocationDiscoverability = new List<Type>(extras);
             implementedTypesForGenericInvocationDiscoverability.Add(type);
-            ProxyInstance proxyInstance = new ProxyInstance(this,
-                                                             implementedTypesForGenericInvocationDiscoverability
-                                                                 .ToArray());
-            RhinoInterceptor interceptor = new RhinoInterceptor(this, proxyInstance, invocationVisitorsFactory.CreateStandardInvocationVisitors(proxyInstance, this));
+            ProxyInstance proxyInstance = new ProxyInstance(this, 
+                                                            implementedTypesForGenericInvocationDiscoverability
+                                                                .ToArray());
+            RhinoInterceptor interceptor = new RhinoInterceptor(this, proxyInstance, 
+                                                                invocationVisitorsFactory.
+                                                                    CreateStandardInvocationVisitors(proxyInstance, this));
 
             List<Type> types = new List<Type>();
             types.AddRange(extras);
-            types.Add(typeof(IMockedObject));
+            types.Add(typeof (IMockedObject));
             proxy =
-                GetProxyGenerator(type).CreateInterfaceProxyWithoutTarget(type, types.ToArray(), proxyGenerationOptions, interceptor);
-            IMockState value = mockStateFactory((IMockedObject)proxy);
+                GetProxyGenerator(type).CreateInterfaceProxyWithoutTarget(type, types.ToArray(), proxyGenerationOptions, 
+                                                                          interceptor);
+            IMockState value = mockStateFactory((IMockedObject) proxy);
             proxies.Add(proxy, value);
             return proxy;
         }
 
+        /// <summary>
+        /// The mock delegate.
+        /// </summary>
+        /// <param name="mockStateFactory">
+        /// The mock state factory.
+        /// </param>
+        /// <param name="type">
+        /// The type.
+        /// </param>
+        /// <returns>
+        /// The mock delegate.
+        /// </returns>
+        /// <exception cref="InvalidOperationException">
+        /// </exception>
         private object MockDelegate(CreateMockState mockStateFactory, Type type)
         {
-            if (typeof(Delegate).Equals(type))
+            if (typeof (Delegate).Equals(type))
                 throw new InvalidOperationException("Cannot mock the Delegate base type.");
 
             object proxy;
 
             ProxyInstance proxyInstance = new ProxyInstance(this);
-            RhinoInterceptor interceptor = new RhinoInterceptor(this, proxyInstance, invocationVisitorsFactory.CreateStandardInvocationVisitors(proxyInstance, this));
+            RhinoInterceptor interceptor = new RhinoInterceptor(this, proxyInstance, 
+                                                                invocationVisitorsFactory.
+                                                                    CreateStandardInvocationVisitors(proxyInstance, this));
 
-            Type[] types = new Type[] { typeof(IMockedObject) };
-            var delegateTargetInterface = delegateTargetInterfaceCreator.GetDelegateTargetInterface(type);
+            Type[] types = new[] {typeof (IMockedObject)};
+            Type delegateTargetInterface = delegateTargetInterfaceCreator.GetDelegateTargetInterface(type);
 
             ProxyGenerator proxyGenerator = GetProxyGenerator(type);
 
-            object target = proxyGenerator.CreateInterfaceProxyWithoutTarget(delegateTargetInterface, types, proxyGenerationOptions, interceptor);
+            object target = proxyGenerator.CreateInterfaceProxyWithoutTarget(delegateTargetInterface, types, 
+                                                                             proxyGenerationOptions, interceptor);
 
             proxy = Delegate.CreateDelegate(type, target, "Invoke");
 
@@ -813,13 +1445,26 @@ namespace Rhino.Mocks
             return proxy;
         }
 
-        /// <summary>This is provided to allow advance extention functionality, where Rhino Mocks standard functionality is not enough.</summary>
-        /// <param name="type">The type to mock</param>
-        /// <param name="factory">Delegate that create the first state of the mocked object (usualy the record state).</param>
-        /// <param name="extras">Additional types to be implemented, this can be only interfaces </param>
-        /// <param name="argumentsForConstructor">optional arguments for the constructor</param>
-        /// <returns></returns>
-        protected object CreateMockObject(Type type, CreateMockState factory, Type[] extras, params object[] argumentsForConstructor)
+        /// <summary>
+        /// This is provided to allow advance extention functionality, where Rhino Mocks standard functionality is not enough.
+        /// </summary>
+        /// <param name="type">
+        /// The type to mock
+        /// </param>
+        /// <param name="factory">
+        /// Delegate that create the first state of the mocked object (usualy the record state).
+        /// </param>
+        /// <param name="extras">
+        /// Additional types to be implemented, this can be only interfaces 
+        /// </param>
+        /// <param name="argumentsForConstructor">
+        /// optional arguments for the constructor
+        /// </param>
+        /// <returns>
+        /// The create mock object.
+        /// </returns>
+        protected object CreateMockObject(Type type, CreateMockState factory, Type[] extras, 
+                                          params object[] argumentsForConstructor)
         {
             foreach (Type extraType in extras)
             {
@@ -834,24 +1479,34 @@ namespace Rhino.Mocks
                 if (argumentsForConstructor != null && argumentsForConstructor.Length > 0)
                 {
                     throw new ArgumentException(
-                        "Constructor arguments should not be supplied when mocking an interface",
+                        "Constructor arguments should not be supplied when mocking an interface", 
                         "argumentsForConstructor");
                 }
+
                 return MockInterface(factory, type, extras);
             }
-            else if (typeof(Delegate).IsAssignableFrom(type))
+            else if (typeof (Delegate).IsAssignableFrom(type))
             {
                 if (argumentsForConstructor != null && argumentsForConstructor.Length > 0)
                 {
-                    throw new ArgumentException("Constructor arguments should not be supplied when mocking a delegate",
+                    throw new ArgumentException("Constructor arguments should not be supplied when mocking a delegate", 
                                                 "argumentsForConstructor");
                 }
+
                 return MockDelegate(factory, type);
             }
             else
                 return MockClass(factory, type, extras, argumentsForConstructor);
         }
 
+        /// <summary>
+        /// The is mock object from this repository.
+        /// </summary>
+        /// <param name="obj">
+        /// The obj.
+        /// </param>
+        /// <exception cref="ObjectNotMockFromThisRepositoryException">
+        /// </exception>
         private void IsMockObjectFromThisRepository(object obj)
         {
             if (proxies.ContainsKey(obj) == false)
@@ -860,10 +1515,13 @@ namespace Rhino.Mocks
         }
 
         /// <summary>
-        ///  Method: GetMockedObject
+        /// Method: GetMockedObject
         ///  Get an IProxy from a mocked object instance, or throws if the 
         ///  object is not a mock object.
         /// </summary>
+        /// <param name="mockedInstance">
+        /// The mocked Instance.
+        /// </param>
         protected internal static IMockedObject GetMockedObject(object mockedInstance)
         {
             return mockedInstance.AsMockObject();
@@ -874,20 +1532,29 @@ namespace Rhino.Mocks
         /// Get an IProxy from a mocked object instance, or null if the
         /// object is not a mock object.
         /// </summary>
+        /// <param name="mockedInstance">
+        /// The mocked Instance.
+        /// </param>
         protected internal static IMockedObject GetMockedObjectOrNull(object mockedInstance)
         {
             return mockedInstance.AsMockObjectOrNull();
         }
 
-        /// <summary>Pops the recorder.</summary>
+        /// <summary>
+        /// Pops the recorder.
+        /// </summary>
         internal void PopRecorder()
         {
             if (recorders.Count > 1)
                 recorders.Pop();
         }
 
-        /// <summary>Pushes the recorder.</summary>
-        /// <param name="newRecorder">New recorder.</param>
+        /// <summary>
+        /// Pushes the recorder.
+        /// </summary>
+        /// <param name="newRecorder">
+        /// New recorder.
+        /// </param>
         internal void PushRecorder(IMethodRecorder newRecorder)
         {
             recorders.Push(newRecorder);
@@ -896,6 +1563,28 @@ namespace Rhino.Mocks
         #endregion
 
         #region Convenience Methods
+
+        /// <summary>
+        /// Gets the replayer for this repository.
+        /// </summary>
+        /// <value></value>
+        internal IMethodRecorder Replayer
+        {
+            get { return rootRecorder; }
+        }
+
+        /// <summary>
+        /// Gets the last proxy which had a method call.
+        /// </summary>
+        internal static IMockedObject LastMockedObject
+        {
+            get
+            {
+                if (lastRepository == null)
+                    return null;
+                return lastRepository.lastMockedObject;
+            }
+        }
 
         /// <summary>
         /// All the mock objects in this repository will be moved
@@ -910,6 +1599,9 @@ namespace Rhino.Mocks
         /// All the mock objects in this repository will be moved
         /// to record state.
         /// </summary>
+        /// <param name="options">
+        /// The options.
+        /// </param>
         public void BackToRecordAll(BackToRecordOptions options)
         {
             if (proxies.Count == 0)
@@ -998,6 +1690,7 @@ namespace Rhino.Mocks
                     validationErrors.Add(e.Message);
                 }
             }
+
             if (validationErrors.Count == 0)
                 return;
             if (validationErrors.Count == 1)
@@ -1007,29 +1700,8 @@ namespace Rhino.Mocks
             {
                 sb.AppendLine(validationError);
             }
+
             throw new ExpectationViolationException(sb.ToString());
-        }
-
-        /// <summary>
-        /// Gets the replayer for this repository.
-        /// </summary>
-        /// <value></value>
-        internal IMethodRecorder Replayer
-        {
-            get { return rootRecorder; }
-        }
-
-        /// <summary>
-        /// Gets the last proxy which had a method call.
-        /// </summary>
-        internal static IMockedObject LastMockedObject
-        {
-            get
-            {
-                if (lastRepository == null)
-                    return null;
-                return lastRepository.lastMockedObject;
-            }
         }
 
         /// <summary>
@@ -1037,6 +1709,9 @@ namespace Rhino.Mocks
         /// with multiple types linearly degrades the performance so this implementation
         /// keeps one ProxyGenerator per type. 
         /// </summary>
+        /// <param name="type">
+        /// The type.
+        /// </param>
         protected virtual ProxyGenerator GetProxyGenerator(Type type)
         {
             if (!generatorMap.ContainsKey(type))
@@ -1048,9 +1723,18 @@ namespace Rhino.Mocks
         }
 
 
-
-        /// <summary>Set the exception to be thrown when verified is called.</summary>
-        protected internal static void SetExceptionToBeThrownOnVerify(object proxy, ExpectationViolationException expectationViolationException)
+        /// <summary>
+        /// Set the exception to be thrown when verified is called.
+        /// </summary>
+        /// <param name="proxy">
+        /// The proxy.
+        /// </param>
+        /// <param name="expectationViolationException">
+        /// The expectation Violation Exception.
+        /// </param>
+        protected internal static void SetExceptionToBeThrownOnVerify(object proxy, 
+                                                                      ExpectationViolationException
+                                                                          expectationViolationException)
         {
             MockRepository repository = GetMockedObject(proxy).Repository;
             if (repository.proxies.ContainsKey(proxy) == false)
@@ -1061,114 +1745,219 @@ namespace Rhino.Mocks
         #endregion
 
         #region AAA Methods (formerly MockRepositoryAAA.cs)
+
         /* MockRepositoryAAA.cs contains further definitions on MockRepository.  MockRepository right now is too large of a class and allowing
          * to exist as partials "masks" the problems of this growing class".  The items in this reagion are transplants from the other file location
          */
 
         // Static methods for working with RhinoMocks using AAA syntax
 
-        /// <summary>Generates a stub without needing a <see cref="MockRepository"/></summary>
-        /// <param name="argumentsForConstructor">Arguments for <typeparamref name="T"/>'s constructor</param>
-        /// <typeparam name="T">The <see cref="Type"/> of stub to create.</typeparam>
-        /// <returns>The stub</returns>
+        /// <summary>
+        /// Generates a stub without needing a <see cref="MockRepository"/>
+        /// </summary>
+        /// <param name="argumentsForConstructor">
+        /// Arguments for <typeparamref name="T"/>'s constructor
+        /// </param>
+        /// <typeparam name="T">
+        /// The <see cref="Type"/> of stub to create.
+        /// </typeparam>
+        /// <returns>
+        /// The stub
+        /// </returns>
         /// <seealso cref="Stub{T}"/>
         public static T GenerateStub<T>(params object[] argumentsForConstructor) where T : class
         {
-            return CreateMockInReplay(repo => (T)repo.Stub(typeof(T), argumentsForConstructor));
+            return CreateMockInReplay(repo => (T) repo.Stub(typeof (T), argumentsForConstructor));
         }
 
-        /// <summary>Generates a stub without needing a <see cref="MockRepository"/></summary>
-        /// <param name="type">The <see cref="Type"/> of stub.</param>
-        /// <param name="argumentsForConstructor">Arguments for the <paramref name="type"/>'s constructor.</param>
-        /// <returns>The stub</returns>
+        /// <summary>
+        /// Generates a stub without needing a <see cref="MockRepository"/>
+        /// </summary>
+        /// <param name="type">
+        /// The <see cref="Type"/> of stub.
+        /// </param>
+        /// <param name="argumentsForConstructor">
+        /// Arguments for the <paramref name="type"/>'s constructor.
+        /// </param>
+        /// <returns>
+        /// The stub
+        /// </returns>
         /// <seealso cref="Stub"/>
         public static object GenerateStub(Type type, params object[] argumentsForConstructor)
         {
             return CreateMockInReplay(repo => repo.Stub(type, argumentsForConstructor));
         }
 
-        /// <summary>Generate a mock object without needing a <see cref="MockRepository"/></summary>
-        /// <typeparam name="T">type <see cref="Type"/> of mock object to create.</typeparam>
-        /// <param name="argumentsForConstructor">Arguments for <typeparamref name="T"/>'s constructor</param>
-        /// <returns>the mock object</returns>
+        /// <summary>
+        /// Generate a mock object without needing a <see cref="MockRepository"/>
+        /// </summary>
+        /// <typeparam name="T">
+        /// type <see cref="Type"/> of mock object to create.
+        /// </typeparam>
+        /// <param name="argumentsForConstructor">
+        /// Arguments for <typeparamref name="T"/>'s constructor
+        /// </param>
+        /// <returns>
+        /// the mock object
+        /// </returns>
         /// <seealso cref="DynamicMock{T}"/>
         public static T GenerateMock<T>(params object[] argumentsForConstructor) where T : class
         {
             return CreateMockInReplay(r => r.DynamicMock<T>(argumentsForConstructor));
         }
 
-        /// <summary>Generate a multi-mock object without needing a <see cref="MockRepository"/></summary>
-        /// <typeparam name="T">The <c>typeof</c> object to generate a mock for.</typeparam>
-        /// <typeparam name="TMultiMockInterface1">A second interface to generate a multi-mock for.</typeparam>
-        /// <param name="argumentsForConstructor">Arguments for <typeparamref name="T"/>'s constructor</param>
-        /// <returns>the multi-mock object</returns>
+        /// <summary>
+        /// Generate a multi-mock object without needing a <see cref="MockRepository"/>
+        /// </summary>
+        /// <typeparam name="T">
+        /// The <c>typeof</c> object to generate a mock for.
+        /// </typeparam>
+        /// <typeparam name="TMultiMockInterface1">
+        /// A second interface to generate a multi-mock for.
+        /// </typeparam>
+        /// <param name="argumentsForConstructor">
+        /// Arguments for <typeparamref name="T"/>'s constructor
+        /// </param>
+        /// <returns>
+        /// the multi-mock object
+        /// </returns>
         /// <seealso cref="DynamicMultiMock(System.Type,System.Type[],object[])"/>
         public static T GenerateMock<T, TMultiMockInterface1>(params object[] argumentsForConstructor)
         {
-            return (T)GenerateMock(typeof(T), new Type[] { typeof(TMultiMockInterface1) }, argumentsForConstructor);
+            return (T) GenerateMock(typeof (T), new[] {typeof (TMultiMockInterface1)}, argumentsForConstructor);
         }
 
-        /// <summary>Generate a multi-mock object without without needing a <see cref="MockRepository"/></summary>
-        /// <typeparam name="T">The <c>typeof</c> object to generate a mock for.</typeparam>
-        /// <typeparam name="TMultiMockInterface1">An interface to generate a multi-mock for.</typeparam>
-        /// <typeparam name="TMultiMockInterface2">A second interface to generate a multi-mock for.</typeparam>
-        /// <param name="argumentsForConstructor">Arguments for <typeparamref name="T"/>'s constructor</param>
-        /// <returns>the multi-mock object</returns>
+        /// <summary>
+        /// Generate a multi-mock object without without needing a <see cref="MockRepository"/>
+        /// </summary>
+        /// <typeparam name="T">
+        /// The <c>typeof</c> object to generate a mock for.
+        /// </typeparam>
+        /// <typeparam name="TMultiMockInterface1">
+        /// An interface to generate a multi-mock for.
+        /// </typeparam>
+        /// <typeparam name="TMultiMockInterface2">
+        /// A second interface to generate a multi-mock for.
+        /// </typeparam>
+        /// <param name="argumentsForConstructor">
+        /// Arguments for <typeparamref name="T"/>'s constructor
+        /// </param>
+        /// <returns>
+        /// the multi-mock object
+        /// </returns>
         /// <seealso cref="DynamicMultiMock(Type,Type[],object[])"/>
-        public static T GenerateMock<T, TMultiMockInterface1, TMultiMockInterface2>(params object[] argumentsForConstructor)
+        public static T GenerateMock<T, TMultiMockInterface1, TMultiMockInterface2>(
+            params object[] argumentsForConstructor)
         {
-            return (T)GenerateMock(typeof(T), new Type[] { typeof(TMultiMockInterface1), typeof(TMultiMockInterface2) }, argumentsForConstructor);
+            return
+                (T)
+                GenerateMock(typeof (T), new[] {typeof (TMultiMockInterface1), typeof (TMultiMockInterface2)}, 
+                             argumentsForConstructor);
         }
 
-        /// <summary>Creates a multi-mock without without needing a <see cref="MockRepository"/></summary>
-        /// <param name="type">The type of mock to create, this can be a class</param>
-        /// <param name="extraTypes">Any extra interfaces to add to the multi-mock, these can only be interfaces.</param>
-        /// <param name="argumentsForConstructor">Arguments for <paramref name="type"/>'s constructor</param>
-        /// <returns>the multi-mock object</returns>
+        /// <summary>
+        /// Creates a multi-mock without without needing a <see cref="MockRepository"/>
+        /// </summary>
+        /// <param name="type">
+        /// The type of mock to create, this can be a class
+        /// </param>
+        /// <param name="extraTypes">
+        /// Any extra interfaces to add to the multi-mock, these can only be interfaces.
+        /// </param>
+        /// <param name="argumentsForConstructor">
+        /// Arguments for <paramref name="type"/>'s constructor
+        /// </param>
+        /// <returns>
+        /// the multi-mock object
+        /// </returns>
         /// <seealso cref="DynamicMultiMock(System.Type,System.Type[],object[])"/>
         public static object GenerateMock(Type type, Type[] extraTypes, params object[] argumentsForConstructor)
         {
             return CreateMockInReplay(r => r.DynamicMultiMock(type, extraTypes, argumentsForConstructor));
         }
 
-        ///<summary>Creates a strict mock without without needing a <see cref="MockRepository"/></summary>
-        ///<param name="argumentsForConstructor">Any arguments required for the <typeparamref name="T"/>'s constructor</param>
-        ///<typeparam name="T">The type of mock object to create.</typeparam>
-        ///<returns>The mock object with strict replay semantics</returns>
+        /// <summary>
+        /// Creates a strict mock without without needing a <see cref="MockRepository"/>
+        /// </summary>
+        /// <param name="argumentsForConstructor">
+        /// Any arguments required for the <typeparamref name="T"/>'s constructor
+        /// </param>
+        /// <typeparam name="T">
+        /// The type of mock object to create.
+        /// </typeparam>
+        /// <returns>
+        /// The mock object with strict replay semantics
+        /// </returns>
         /// <seealso cref="StrictMock{T}"/>
         public static T GenerateStrictMock<T>(params object[] argumentsForConstructor)
         {
             return CreateMockInReplay(r => r.StrictMock<T>(argumentsForConstructor));
         }
 
-        ///<summary>Creates a strict multi-mock without needing a <see cref="MockRepository"/></summary>
-        ///<param name="argumentsForConstructor">Any arguments required for the <typeparamref name="T"/>'s constructor</param>
-        ///<typeparam name="T">The type of mock object to create, this can be a class.</typeparam>
-        ///<typeparam name="TMultiMockInterface1">An interface to generate a multi-mock for, this must be an interface!</typeparam>
-        ///<returns>The multi-mock object with strict replay semantics</returns>
+        /// <summary>
+        /// Creates a strict multi-mock without needing a <see cref="MockRepository"/>
+        /// </summary>
+        /// <param name="argumentsForConstructor">
+        /// Any arguments required for the <typeparamref name="T"/>'s constructor
+        /// </param>
+        /// <typeparam name="T">
+        /// The type of mock object to create, this can be a class.
+        /// </typeparam>
+        /// <typeparam name="TMultiMockInterface1">
+        /// An interface to generate a multi-mock for, this must be an interface!
+        /// </typeparam>
+        /// <returns>
+        /// The multi-mock object with strict replay semantics
+        /// </returns>
         /// <seealso cref="StrictMultiMock(System.Type,System.Type[],object[])"/>
         public static T GenerateStrictMock<T, TMultiMockInterface1>(params object[] argumentsForConstructor)
         {
-            return (T)GenerateStrictMock(typeof(T), new Type[] { typeof(TMultiMockInterface1) }, argumentsForConstructor);
+            return (T) GenerateStrictMock(typeof (T), new[] {typeof (TMultiMockInterface1)}, argumentsForConstructor);
         }
 
-        ///<summary>Creates a strict multi-mock without needing a <see cref="MockRepository"/></summary>
-        ///<param name="argumentsForConstructor">Any arguments required for the <typeparamref name="T"/>'s constructor</param>
-        ///<typeparam name="T">The type of mock object to create, this can be a class.</typeparam>
-        ///<typeparam name="TMultiMockInterface1">An interface to generate a multi-mock for, this must be an interface!</typeparam>
-        ///<typeparam name="TMultiMockInterface2">A second interface to generate a multi-mock for, this must be an interface!</typeparam>
-        ///<returns>The multi-mock object with strict replay semantics</returns>
-        ///<seealso cref="StrictMultiMock(System.Type,System.Type[],object[])"/>
-        public static T GenerateStrictMock<T, TMultiMockInterface1, TMultiMockInterface2>(params object[] argumentsForConstructor)
+        /// <summary>
+        /// Creates a strict multi-mock without needing a <see cref="MockRepository"/>
+        /// </summary>
+        /// <param name="argumentsForConstructor">
+        /// Any arguments required for the <typeparamref name="T"/>'s constructor
+        /// </param>
+        /// <typeparam name="T">
+        /// The type of mock object to create, this can be a class.
+        /// </typeparam>
+        /// <typeparam name="TMultiMockInterface1">
+        /// An interface to generate a multi-mock for, this must be an interface!
+        /// </typeparam>
+        /// <typeparam name="TMultiMockInterface2">
+        /// A second interface to generate a multi-mock for, this must be an interface!
+        /// </typeparam>
+        /// <returns>
+        /// The multi-mock object with strict replay semantics
+        /// </returns>
+        /// <seealso cref="StrictMultiMock(System.Type,System.Type[],object[])"/>
+        public static T GenerateStrictMock<T, TMultiMockInterface1, TMultiMockInterface2>(
+            params object[] argumentsForConstructor)
         {
-            return (T)GenerateStrictMock(typeof(T), new Type[] { typeof(TMultiMockInterface1), typeof(TMultiMockInterface2) }, argumentsForConstructor);
+            return
+                (T)
+                GenerateStrictMock(typeof (T), new[] {typeof (TMultiMockInterface1), typeof (TMultiMockInterface2)}, 
+                                   argumentsForConstructor);
         }
 
-        ///<summary>Creates a strict multi-mock without needing a <see cref="MockRepository"/></summary>
-        ///<param name="type">The type of mock object to create, this can be a class</param>
-        ///<param name="extraTypes">Any extra interfaces to generate a multi-mock for, these must be interaces!</param>
-        ///<param name="argumentsForConstructor">Any arguments for the <paramref name="type"/>'s constructor</param>
-        ///<returns>The strict multi-mock object</returns>
+        /// <summary>
+        /// Creates a strict multi-mock without needing a <see cref="MockRepository"/>
+        /// </summary>
+        /// <param name="type">
+        /// The type of mock object to create, this can be a class
+        /// </param>
+        /// <param name="extraTypes">
+        /// Any extra interfaces to generate a multi-mock for, these must be interaces!
+        /// </param>
+        /// <param name="argumentsForConstructor">
+        /// Any arguments for the <paramref name="type"/>'s constructor
+        /// </param>
+        /// <returns>
+        /// The strict multi-mock object
+        /// </returns>
         /// <seealso cref="StrictMultiMock(System.Type,System.Type[],object[])"/>
         public static object GenerateStrictMock(Type type, Type[] extraTypes, params object[] argumentsForConstructor)
         {
@@ -1178,45 +1967,70 @@ namespace Rhino.Mocks
             return CreateMockInReplay(r => r.StrictMultiMock(type, extraTypes, argumentsForConstructor));
         }
 
-        ///<summary>
-        ///</summary>
-        ///<param name="argumentsForConstructor"></param>
-        ///<typeparam name="T"></typeparam>
-        ///<returns></returns>
+        /// <summary>
+        /// The generate partial mock.
+        /// </summary>
+        /// <param name="argumentsForConstructor">
+        /// </param>
+        /// <typeparam name="T">
+        /// </typeparam>
+        /// <returns>
+        /// </returns>
         public static T GeneratePartialMock<T>(params object[] argumentsForConstructor)
         {
-            return (T)GeneratePartialMock(typeof(T), new Type[0], argumentsForConstructor);
+            return (T) GeneratePartialMock(typeof (T), new Type[0], argumentsForConstructor);
         }
 
-        ///<summary>
-        ///</summary>
-        ///<param name="argumentsForConstructor"></param>
-        ///<typeparam name="T"></typeparam>
-        ///<typeparam name="TMultiMockInterface1"></typeparam>
-        ///<returns></returns>
+        /// <summary>
+        /// The generate partial mock.
+        /// </summary>
+        /// <param name="argumentsForConstructor">
+        /// </param>
+        /// <typeparam name="T">
+        /// </typeparam>
+        /// <typeparam name="TMultiMockInterface1">
+        /// </typeparam>
+        /// <returns>
+        /// </returns>
         public static T GeneratePartialMock<T, TMultiMockInterface1>(params object[] argumentsForConstructor)
         {
-            return (T)GeneratePartialMock(typeof(T), new Type[] { typeof(TMultiMockInterface1) }, argumentsForConstructor);
+            return (T) GeneratePartialMock(typeof (T), new[] {typeof (TMultiMockInterface1)}, argumentsForConstructor);
         }
 
-        ///<summary>
-        ///</summary>
-        ///<param name="argumentsForConstructor"></param>
-        ///<typeparam name="T"></typeparam>
-        ///<typeparam name="TMultiMockInterface1"></typeparam>
-        ///<typeparam name="TMultiMockInterface2"></typeparam>
-        ///<returns></returns>
-        public static T GeneratePartialMock<T, TMultiMockInterface1, TMultiMockInterface2>(params object[] argumentsForConstructor)
+        /// <summary>
+        /// The generate partial mock.
+        /// </summary>
+        /// <param name="argumentsForConstructor">
+        /// </param>
+        /// <typeparam name="T">
+        /// </typeparam>
+        /// <typeparam name="TMultiMockInterface1">
+        /// </typeparam>
+        /// <typeparam name="TMultiMockInterface2">
+        /// </typeparam>
+        /// <returns>
+        /// </returns>
+        public static T GeneratePartialMock<T, TMultiMockInterface1, TMultiMockInterface2>(
+            params object[] argumentsForConstructor)
         {
-            return (T)GeneratePartialMock(typeof(T), new Type[] { typeof(TMultiMockInterface1), typeof(TMultiMockInterface2) }, argumentsForConstructor);
+            return
+                (T)
+                GeneratePartialMock(typeof (T), new[] {typeof (TMultiMockInterface1), typeof (TMultiMockInterface2)}, 
+                                    argumentsForConstructor);
         }
 
-        ///<summary>
-        ///</summary>
-        ///<param name="type"></param>
-        ///<param name="extraTypes"></param>
-        ///<param name="argumentsForConstructor"></param>
-        ///<returns></returns>
+        /// <summary>
+        /// The generate partial mock.
+        /// </summary>
+        /// <param name="type">
+        /// </param>
+        /// <param name="extraTypes">
+        /// </param>
+        /// <param name="argumentsForConstructor">
+        /// </param>
+        /// <returns>
+        /// The generate partial mock.
+        /// </returns>
         public static object GeneratePartialMock(Type type, Type[] extraTypes, params object[] argumentsForConstructor)
         {
             return CreateMockInReplay(r => r.PartialMultiMock(type, extraTypes, argumentsForConstructor));
@@ -1225,6 +2039,11 @@ namespace Rhino.Mocks
         /// <summary>
         /// Generate a mock object with dynamic replay semantics and remoting without needing the mock repository
         /// </summary>
+        /// <typeparam name="T">
+        /// </typeparam>
+        /// <param name="argumentsForConstructor">
+        /// The arguments For Constructor.
+        /// </param>
         public static T GenerateDynamicMockWithRemoting<T>(params object[] argumentsForConstructor)
         {
             return CreateMockInReplay(r => r.DynamicMockWithRemoting<T>(argumentsForConstructor));
@@ -1233,265 +2052,76 @@ namespace Rhino.Mocks
         /// <summary>
         /// Generate a mock object with strict replay semantics and remoting without needing the mock repository
         /// </summary>
+        /// <typeparam name="T">
+        /// </typeparam>
+        /// <param name="argumentsForConstructor">
+        /// The arguments For Constructor.
+        /// </param>
         public static T GenerateStrictMockWithRemoting<T>(params object[] argumentsForConstructor) where T : class
         {
             return CreateMockInReplay(r => r.StrictMockWithRemoting<T>(argumentsForConstructor));
         }
 
-        /// <summary>Helper method to create a mock object without a repository instance and put the object back into replay mode.</summary>
-        /// <typeparam name="T">The type of mock object to create</typeparam>
-        /// <param name="createMock">A delegate that uses a mock repository instance to create the underlying mock</param>
-        /// <returns>The mock object in the replay mode.</returns>
+        /// <summary>
+        /// Helper method to create a mock object without a repository instance and put the object back into replay mode.
+        /// </summary>
+        /// <typeparam name="T">
+        /// The type of mock object to create
+        /// </typeparam>
+        /// <param name="createMock">
+        /// A delegate that uses a mock repository instance to create the underlying mock
+        /// </param>
+        /// <returns>
+        /// The mock object in the replay mode.
+        /// </returns>
         private static T CreateMockInReplay<T>(Func<MockRepository, T> createMock)
         {
-            var repository = new MockRepository();
-            var mockObject = createMock(repository);
+            MockRepository repository = new MockRepository();
+            T mockObject = createMock(repository);
             repository.Replay(mockObject);
             return mockObject;
         }
 
-
         #endregion
 
         #region Mock Repository using (formerly part of MockRepositoryRecordPlayback.cs)
+
         /* Much like the "AAA Methods ..." region block above, the code in this region was in it's own file
          * which masked the problem of the growing file"
          */
 
-        //<summary>
+        // <summary>
         // Adds optional new usage:
-        //   using(mockRepository.Record()) {
-        //      Expect.Call(mock.Method()).Return(retVal);
-        //   }
-        //   using(mockRepository.Playback()) {
-        //      // Execute code
-        //   }
+        // using(mockRepository.Record()) {
+        // Expect.Call(mock.Method()).Return(retVal);
+        // }
+        // using(mockRepository.Playback()) {
+        // // Execute code
+        // }
         // N.B. mockRepository.ReplayAll() and mockRepository.VerifyAll()
-        //      calls are taken care of by Record/Playback
-        //</summary>
+        // calls are taken care of by Record/Playback
+        // </summary>
 
-        ///<summary>
-        ///</summary>
-        ///<returns></returns>
+        /// <summary>
+        /// The record.
+        /// </summary>
+        /// <returns>
+        /// </returns>
         public IModeChanger Record()
         {
             return new RecordModeChanger(this);
         }
 
-        ///<summary>
-        ///</summary>
-        ///<returns></returns>
+        /// <summary>
+        /// The playback.
+        /// </summary>
+        /// <returns>
+        /// </returns>
         public IModeChanger Playback()
         {
             return new PlaybackModeChanger(this);
         }
 
         #endregion
-
-        /// <summary>
-        /// Creates a mock for the spesified type with strict mocking semantics.
-        /// <para>Strict semantics means that any call that wasn't explicitly recorded is considered an error and would cause an exception to be thrown.</para>
-        /// </summary>
-        /// <param name="argumentsForConstructor">Arguments for the class' constructor, if mocking a concrete class</param>
-        [Obsolete("Use StrictMock instead")]
-        public T CreateMock<T>(params object[] argumentsForConstructor)
-        {
-            return StrictMock<T>(argumentsForConstructor);
-        }
-
-        /// <summary>
-        /// Creates a mock for the spesified type with strict mocking semantics.
-        /// <para>Strict semantics means that any call that wasn't explicitly recorded is considered an error and would cause an exception to be thrown.</para>
-        /// </summary>
-        /// <param name="argumentsForConstructor">Arguments for the class' constructor, if mocking a concrete class</param>
-        public T StrictMock<T>(params object[] argumentsForConstructor)
-        {
-            if (ShouldUseRemotingProxy(typeof(T), argumentsForConstructor))
-                return (T)RemotingMock(typeof(T), CreateRecordState);
-            return (T)CreateMockObject(typeof(T), CreateRecordState, new Type[0], argumentsForConstructor);
-        }
-
-        private static bool ShouldUseRemotingProxy(Type type, object[] argumentsForConstructor)
-        {
-            return typeof(MarshalByRefObject).IsAssignableFrom(type) &&
-                (argumentsForConstructor == null || argumentsForConstructor.Length == 0);
-        }
-
-        /*
-         * Method: DynamicMock<T>
-         * Create a mock object of type T with dynamic semantics.
-         * Dynamic semantics means that any call that wasn't explicitly recorded is accepted and a
-         * null or zero is returned (if there is a return value).
-         */
-
-        /// <summary>
-        /// Creates a dynamic mock for the specified type.
-        /// </summary>
-        /// <param name="argumentsForConstructor">Arguments for the class' constructor, if mocking a concrete class</param>
-        public T DynamicMock<T>(params object[] argumentsForConstructor)
-            where T : class
-        {
-            if (ShouldUseRemotingProxy(typeof(T), argumentsForConstructor))
-                return (T)RemotingMock(typeof(T), CreateDynamicRecordState);
-            return (T)CreateMockObject(typeof(T), CreateDynamicRecordState, new Type[0], argumentsForConstructor);
-        }
-
-        /// <summary>
-        /// Creates a mock object from several types.
-        /// </summary>
-        [Obsolete("Use StrictMultiMock instead")]
-        public T CreateMultiMock<T>(params Type[] extraTypes)
-        {
-            return StrictMultiMock<T>(extraTypes);
-        }
-
-        /// <summary>
-        /// Creates a strict mock object from several types.
-        /// </summary>
-        public T StrictMultiMock<T>(params Type[] extraTypes)
-        {
-            return (T)StrictMultiMock(typeof(T), extraTypes);
-        }
-
-        /// <summary>
-        /// Create a mock object from several types with dynamic semantics.
-        /// </summary>
-        public T DynamicMultiMock<T>(params Type[] extraTypes)
-        {
-            return (T)DynamicMultiMock(typeof(T), extraTypes);
-        }
-
-        /// <summary>
-        /// Create a mock object from several types with partial semantics.
-        /// </summary>
-        public T PartialMultiMock<T>(params Type[] extraTypes)
-        {
-            return (T)PartialMultiMock(typeof(T), extraTypes);
-        }
-
-        /// <summary>
-        /// Create a mock object from several types with strict semantics.
-        /// </summary>
-        /// <param name="extraTypes">Extra interface types to mock.</param>
-        /// <param name="argumentsForConstructor">Arguments for the class' constructor, if mocking a concrete class</param>
-        [Obsolete("Use StrictMultiMock instead")]
-        public T CreateMultiMock<T>(Type[] extraTypes, params object[] argumentsForConstructor)
-        {
-            return StrictMultiMock<T>(extraTypes, argumentsForConstructor);
-        }
-
-
-        /// <summary>
-        /// Create a strict mock object from several types with strict semantics.
-        /// </summary>
-        /// <param name="extraTypes">Extra interface types to mock.</param>
-        /// <param name="argumentsForConstructor">Arguments for the class' constructor, if mocking a concrete class</param>
-        public T StrictMultiMock<T>(Type[] extraTypes, params object[] argumentsForConstructor)
-        {
-            return (T)StrictMultiMock(typeof(T), extraTypes, argumentsForConstructor);
-        }
-
-        /// <summary>
-        /// Create a mock object from several types with dynamic semantics.
-        /// </summary>
-        /// <param name="extraTypes">Extra interface types to mock.</param>
-        /// <param name="argumentsForConstructor">Arguments for the class' constructor, if mocking a concrete class</param>
-        public T DynamicMultiMock<T>(Type[] extraTypes, params object[] argumentsForConstructor)
-        {
-            return (T)DynamicMultiMock(typeof(T), extraTypes, argumentsForConstructor);
-        }
-
-        /// <summary>
-        /// Create a mock object from several types with partial semantics.
-        /// </summary>
-        /// <param name="extraTypes">Extra interface types to mock.</param>
-        /// <param name="argumentsForConstructor">Arguments for the class' constructor, if mocking a concrete class</param>
-        public T PartialMultiMock<T>(Type[] extraTypes, params object[] argumentsForConstructor)
-        {
-            return (T)PartialMultiMock(typeof(T), extraTypes, argumentsForConstructor);
-        }
-
-        /*
-         * Method: PartialMock
-         * Create a mock object with from a class that defaults to calling the class methods
-         * if no expectation is set on the method.
-         * 
-         */
-
-        /// <summary>
-        /// Create a mock object with from a class that defaults to calling the class methods
-        /// </summary>
-        /// <param name="argumentsForConstructor">Arguments for the class' constructor, if mocking a concrete class</param>
-        public T PartialMock<T>(params object[] argumentsForConstructor) where T : class
-        {
-            return (T)PartialMock(typeof(T), argumentsForConstructor);
-        }
-
-        /// <summary>
-        /// Create a stub object, one that has properties and events ready for use, and 
-        /// can have methods called on it. It requires an explicit step in order to create 
-        /// an expectation for a stub.
-        /// </summary>
-        /// <param name="argumentsForConstructor">The arguments for constructor.</param>
-        public T Stub<T>(params object[] argumentsForConstructor)
-        {
-            return (T)Stub(typeof(T), argumentsForConstructor);
-        }
-
-        /// <summary>
-        /// Create a stub object, one that has properties and events ready for use, and
-        /// can have methods called on it. It requires an explicit step in order to create
-        /// an expectation for a stub.
-        /// </summary>
-        /// <param name="type">The type.</param>
-        /// <param name="argumentsForConstructor">The arguments for constructor.</param>
-        /// <returns>The stub</returns>
-        public object Stub(Type type, params object[] argumentsForConstructor)
-        {
-            CreateMockState createStub = mockedObject => new StubRecordMockState(mockedObject, this);
-            if (ShouldUseRemotingProxy(type, argumentsForConstructor))
-                return RemotingMock(type, createStub);
-            return CreateMockObject(type, createStub, new Type[0], argumentsForConstructor);
-        }
-
-        /// <summary>
-        /// Returns true if the passed mock is currently in replay mode.
-        /// </summary>
-        /// <param name="mock">The mock to test.</param>
-        /// <returns>True if the mock is in replay mode, false otherwise.</returns>
-        public bool IsInReplayMode(object mock)
-        {
-            if (mock == null)
-                throw new ArgumentNullException("mock");
-
-            if (proxies.ContainsKey(mock))
-            {
-                return proxies[mock] is ReplayMockState;
-            }
-
-            throw new ArgumentException(mock + " is not a mock.", "mock");
-        }
-
-        /// <summary>
-        /// Determines whether the specified proxy is a stub.
-        /// </summary>
-        /// <param name="proxy">The proxy.</param>
-        protected internal static bool IsStub(object proxy)
-        {
-            MockRepository repository = GetMockedObject(proxy).Repository;
-            IMockState mockState = repository.proxies[proxy];
-            return mockState is StubRecordMockState || mockState is StubReplayMockState;
-        }
-
-        /// <summary>
-        /// Register a call on a prperty behavior 
-        /// </summary>
-        /// <param name="instance"></param>
-        protected internal void RegisterPropertyBehaviorOn(IMockedObject instance)
-        {
-            lastRepository = this;
-            lastMockedObject = instance;
-            proxies[instance].NotifyCallOnPropertyBehavior();
-        }
     }
 }

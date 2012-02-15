@@ -30,12 +30,12 @@
 using System;
 using System.Reflection;
 using Xunit;
-using Rhino.Mocks.Constraints;
-using Rhino.Mocks.Expectations;
-using Rhino.Mocks.Impl;
-using Rhino.Mocks.Interfaces;
+using Mammock.Constraints;
+using Mammock.Expectations;
+using Mammock.Impl;
+using Mammock.Interfaces;
 
-namespace Rhino.Mocks.Tests.Expectations
+namespace Mammock.Tests.Expectations
 {
 	
 	public class ConstraintExpectationTests:AbstractExpectationTests

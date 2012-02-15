@@ -1,4 +1,4 @@
-namespace Rhino.Mocks.Tests.FieldsProblem
+namespace Mammock.Tests.FieldsProblem
 {
 	using System;
 	using Xunit;
